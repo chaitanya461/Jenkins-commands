@@ -1,0 +1,13 @@
+sudo su
+yum install git java-1.8.0-openjdk maven tree -y
+mvn -v
+git clone https://github.com/ReyazShaik/java-project-maven-new.git
+cd java-project-maven-new
+ls
+tree
+mvn validate
+mvn complie
+mvn test
+mvn package 
+mvn install
+mvn clean
