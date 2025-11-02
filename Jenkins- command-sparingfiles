@@ -1,0 +1,61 @@
+sudo su
+hostnamectl set-hostname Jenkins
+sudo -i
+ssh-keygen
+eval $(ssh-agent -s)
+cd /root/.ssh/
+ls
+vi my.pem
+chmod 400 my.pem
+ssh-add my.pem
+ssh-copy-id -i id_rsa.pub ec2-user@private_ip
+ssh ec2-user@private_ip
+exit
+
+-----add file in job directory 
+cd /var/lib/jenkins/
+ls
+----+_-----------------------------------------
+Manage Jenkins --> Plugins --> Publish Over SSH
+
+Manage Jenkins --> System --> Publish Over SSH
+
+cd /root/.ssh
+
+cat id_rsa
+
+--> Publish over SSH --> key -->
+
+Paste this id_rsa data in "Key" section in Jenkins
+
+SSH Server --> ADD
+
+Name TestServer
+
+Hostname Private IP
+
+Username = ec2-user
+
+Test Configuration
+
+Create a new job
+
+New item --> Remotefiles -> FreeStyle --> OK
+
+Build Steps --> Send files or execute commands over SSH -->
+
+Name autoselect
+
+Build now --> First build empty job because it will create a directory in working we got error
+go home directly for Jenkins add file in it as commands
+cd /var/lib/jenkins/
+ls
+cd Remotefiles/
+ls
+mkdir files/
+cd files/
+touch python{1..2}
+Build Steps --> Send files or execute commands over SSH -->
+source ----> files/* or files/python*
+
+ 
