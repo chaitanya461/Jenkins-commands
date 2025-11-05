@@ -6,7 +6,7 @@ eval $(ssh-agent -s)
 cd /root/.ssh/
 ls
 vi my.pem
-chmod 400 my.pem
+chmod 400 my.pem     ---kepainameshouldbesame
 ssh-add my.pem
 ssh-copy-id -i id_rsa.pub ec2-user@private_ip
 ssh ec2-user@private_ip
