@@ -1,0 +1,161 @@
+Example: Nginx Configuration Template
+
+iTop Screen Recorder
+
+mkdir templates
+
+cd templates
+
+1
+
+Create a Jinja2 Template (templates/nginx.conf.j2)
+
+vi nginx.conf.j2
+
+server {
+
+listen {{ nginx_port }};
+
+server_name {{ server_name}};
+
+location / {
+
+root {{ web_root }};
+
+index index.html;
+
+}
+}
+
+cd ..
+vi nginx.yml
+
+---
+- name: Deploy Nginx Config using Jinja2
+
+hosts: all
+
+become: yes
+
+vars:
+
+nginx_port: 80
+
+server_name: mywebsite.com
+
+web_root: /var/www/html
+
+tasks:
+
+name: Enable Nginx Repo
+
+command: amazon-linux-extras enable nginx1
+
+name: Install Nginx
+
+yum:
+
+name: nginx
+
+state: present
+
+name: Copy Nginx Config with Template
+
+template:
+
+src: templates/nginx.conf.j2
+
+dest: /etc/nginx/nginx.conf
+
+notify: Restart Nginx
+handlers:
+
+name: Restart Nginx
+
+service:
+
+name: nginx
+
+state: restarted
+
+ansible-playbook nginx.yml
+
+
+
+mkdir templates
+
+#Apache HTTPD Configuration File
+
+vi httpd.conf.j2
+
+Listen {{ http_port }}
+
+<VirtualHost *:{{ http_port }}>
+
+ServerName {{ server_name})
+
+DocumentRoot {{ document_root }}
+
+<Directory "{{ document_root }}">
+
+AllowOverride None
+
+Require all granted
+
+</Directory>
+
+ErrorLog /var/log/httpd/{{ server_name }}_error.log
+
+CustomLog /var/log/httpd/{{ server_name}}_access.log combined
+
+</VirtualHost>
+
+
+
+---
+- name: Configure Apache HTTPD with Jinja2
+
+hosts: all
+
+become:
+
+yes
+
+vars:
+
+http port: 80
+
+server name: example.com
+
+document_root: /var/www/html
+
+tasks:
+
+name: Install Apache (httpd)
+
+yum:
+
+name: httpd
+
+state: present
+
+name: Deploy Apache Configuration
+
+template:
+
+src: templates/httpd.conf.j2
+
+dest: /etc/httpd/conf/httpd.conf
+
+notify: Restart Apache
+
+handlers:
+
+name: Restart Apache
+
+systemd:
+
+name: httpd
+
+state: restarted
+
