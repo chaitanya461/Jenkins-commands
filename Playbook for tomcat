@@ -49,9 +49,7 @@ template:
 
 src: context.xml
 
-dest:
-
-/root/tomcat/webapps/manager/META-INF/context.xml
+dest: /root/tomcat/webapps/manager/META-INF/context.xml
 
 name: Create Tomcat systemd Service File
 
@@ -88,7 +86,8 @@ Restart=on-failure
 [Install]
 
 WantedBy=multi-user.target
-name: Reload systemd
+
+- name: Reload systemd
 
 systemd:
 
