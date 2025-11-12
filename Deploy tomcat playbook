@@ -1,16 +1,10 @@
-name: Deploying war to Tomcat Servers
-
-hosts: all
-
-tasks:
-
-name: Copying war file to Tomcat Servers
-
-copy:
-
-/var/lib/jenkins/workspace/project/target/myapp.war
-
-src: dest: /root/tomcat/webapps
-
+---
+- name: Deploying war to Tomcat Servers
+  hosts: all
+  tasks:
+    - name: Copy myapp.war to Tomcat webapps directory
+      copy:
+        src: /var/lib/jenkins/workspace/job1/target/myapp.war
+        dest: /root/tomcat/webapps/
 
 ---- mv deploy.yml to /etc/ansible
