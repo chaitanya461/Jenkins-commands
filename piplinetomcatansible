@@ -1,0 +1,30 @@
+pipeline {
+    agent any
+    stages {
+        stage('checkout') {
+            steps {
+                git 'https://github.com/chaitanya461/java-project-maven-new.git'
+            }
+        }
+        stage('compile') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
+        stage('test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+        stage('Artifacts') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+        stage('ansible_deploy') {
+            steps {
+                ansiblePlaybook credentialsId: 'ansible_cre', disableHostKeyChecking: true, installation: 'ansible', inventory: '/etc/ansible/hosts', playbook: '/etc/ansible/deploy.yml', vaultTmpPath: ''
+            }
+        }
+    }
+}
