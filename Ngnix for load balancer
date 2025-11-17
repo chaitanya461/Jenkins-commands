@@ -30,13 +30,13 @@ services:
     image: ghcr.io/benc-uk/python-demoapp:latest
     container_name: backend2
     expose:
-      - "5001"
+      - "5000"
 
   backend3:
     image: ghcr.io/benc-uk/python-demoapp:latest
     container_name: backend3
     expose:
-      - "5002"
+      - "5000"
 
 
 
@@ -44,8 +44,8 @@ vi nginx.conf
 
 upstream backend {
         server backend1:5000;
-        server backend2:5001;
-        server backend3:5002;
+        server backend2:5000;
+        server backend3:5000;
 }
 
 
