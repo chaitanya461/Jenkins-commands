@@ -1,0 +1,48 @@
+vi app.py
+
+from flask import Flask
+import socket
+
+app = Flask(__name__)
+
+@app.route('/')
+def hello():
+    # Format the string to include the actual hostname
+    return f"Hello from {socket.gethostname()}!"
+
+if __name__ == '__main__':
+    # Remove the comma after app.run and ensure correct syntax
+    app.run(host='0.0.0.0', port=5000)
+
+
+#Create requirements.txt
+
+vi requirements.txt
+
+flask
+
+
+
+
+vi Dockerfile
+
+#Use Python base image FROM python:.9
+
+#Set working directory. 
+WORKDIR /app
+
+#Copy and install dependencies
+
+COPY requirements.txt
+
+RUN pip install -r requirements.txt
+
+#Copy the application code COPY
+
+#Expose the port Flask runs on
+ EXPOSE 5000
+
+# Start the Flask app
+ CMD ["python", "app.py"]
+
+
