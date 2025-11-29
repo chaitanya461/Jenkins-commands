@@ -1,0 +1,99 @@
+vi replicaSet.yml
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: ib-r5
+  labels:
+    app: bank
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      containers:
+      - name: cont1
+        image: trainerreyaz/ib-image:latest
+---------+-------------_-----------------------------&--------------------------__------------
+
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: ib-rs
+  labels:
+    app: bank
+spec:
+  replicas: 3
+  selector:
+    app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      containers:
+      - name: cont1
+        image: trainerreyaz/ib-image:latest
+
+---------+-------------_-----------------------------&--------------------------__------------
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: two-container-pod
+  labels:
+    app: multi-container
+spec:
+  containers:
+  - name: nginx-container
+    image: nginx
+    ports:
+    - containerPort: 80
+  - name: busybox-container
+    image: busybox
+    command: ["sh", "-c", "while true; do echo 'Hello from BusyBox'; sleep 10; done"]
+
+---------+-------------_-----------------------------&--------------------------__------------
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: non-parallel-job
+spec:
+  template:
+    metadata:
+      name: non-parallel-pod
+    spec:
+      containers:
+      - name: non-parallel-container
+        image: busybox
+        command: ["echo", "Hello from the non-parallel job"]
+      restartPolicy: Never
+  completions:3
+
+---------+-------------_-----------------------------&--------------------------__------------
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: parallel-fixed-count-job
+spec:
+  template:
+    metadata:
+      name: parallel-fixed-count-pod
+    spec:
+      containers:
+      - name: parallel-fixed-count-container
+        image: busybox
+        command: ["echo", "Hello from the parallel-fixed-count job"]
+      restartPolicy: Never
+  completions: 6
+  parallelism: 3
+
+---------+-------------_-----------------------------&--------------------------__------------
+
