@@ -19,6 +19,29 @@ spec:
       containers:
       - name: cont1
         image: trainerreyaz/ib-image:latest
+
+
+kubectl create f replicaset.yml
+
+kubectl get replicaset
+
+(or)
+
+kubectl get rs
+
+kubectl get rs-b -o wide [This command will get more details about ReplciaSets]
+
+kubectl describe rs ib-rs [This will describe about internetbanking-rs]
+
+kubectl get pods
+
+kubectl get pods --show-labels [This will list the pods with Labels]
+
+If you delete any pod, automatically new pod will be created, if you want to watch live, open another terminate and give.
+
+kubectl get pods --watch
+
+kubectl get pods
 ---------+-------------_-----------------------------&--------------------------__------------
 
 apiVersion: v1
@@ -42,6 +65,50 @@ spec:
 
 ---------+-------------_-----------------------------&--------------------------__------------
 
+apiVersion: apps/v1
+kind: Deployment 
+metadata:
+  name: ib-r5
+  labels:
+    app: bank
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      containers:
+      - name: cont1
+        image: trainerreyaz/ib-image:latest
+
+
+kubectl rollout history deploy/ib-deployment
+
+
+kubectl rollout undo deploy/ib-deployment [It will go back to previous application / image ]
+
+kubectl get pods [Pods are terminating and creating new pods with new image, this was not possible in Replicas
+
+kubectl describe pods grep -i image
+
+1 kubectl rollout pause deploy/ib-deployment it is like lock, cannot undo, cannot rollout to previous
+
+not possible
+
+kubectl rollout undo deploy/ib-deployment
+
+kubectl rollout resume deploy/ib-deployment
+
+kubectl rollout undo deploy/ib-deployment     now possible
+
+kubectl rollout status deploy/ib-deployment
+
+------+-------------_-----------------------------&--------------------------__------------
+
 apiVersion: v1
 kind: Pod
 metadata:
@@ -57,6 +124,13 @@ spec:
   - name: busybox-container
     image: busybox
     command: ["sh", "-c", "while true; do echo 'Hello from BusyBox'; sleep 10; done"]
+
+kubectl apply -f pod-two-containers.yaml
+
+kubectl get pods [we get single pod but 2/2 meaning, 2 containers]
+
+kubectl logs two-container-pod -c busybox-container
+
 
 ---------+-------------_-----------------------------&--------------------------__------------
 
@@ -97,3 +171,18 @@ spec:
 
 ---------+-------------_-----------------------------&--------------------------__------------
 
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: hello-cronjob
+spec:
+  schedule: "*/1 * * * *" # Runs every minute
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: hello-container
+            image: busybox
+            command: ["sh", "-c", "echo Hello from Kubernetes!"]
+          restartPolicy: Never
