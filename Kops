@@ -93,3 +93,62 @@ kops rolling-update cluster --yes
 See in AWS Console, 1 additional Master nodes got created
 
 kubectl get nodes [takes time to show]
+
+_--------------------------------------------------------
+
+IF ERROR
+
+Step 3: If Kubelet is Installed but Not Found in Systemd If kubelet is installed but still not found in systemd, try reloading systemd:
+
+sudo systemctl daemon-reload
+
+sudo systemctl restart kubelet
+
+If the issue persists, manually add the systemd service file:
+
+sudo nano /etc/systemd/system/kubelet.service
+
+[Service]
+ExecStart=/usr/bin/kubelet Restart always StartLimitInterval=0
+RestartSec=10
+[Install]
+WantedBy=multi-user.target
+Then reload and start:
+
+sudo systemctl daemon-reload sudo systemctl enable kubelet sudo systemctl restart kubelet
+
+Step 4: Check Logs for Errors If kubelet is still failing, check logs:
+
+journalctl -u kubelet -f
+
+----------------------------------------------------------
+
+Lets create a pods in namespaces
+
+kubectl get ns
+
+kubectl create ns dev
+
+kubectl get ns
+
+Currently I am in default namespace, how to check
+
+kubectl config view [ output doesn't show namespace, if you don't see any namespace, this is default]
+
+kubectl config set-context-current-namespace dev [This is use to switch to move from another namespace]
+
+kubectl config view [ Now this output show dev namespace]
+
+kubectl get pods [Now you are in dev namespace, now you cannot see any pods of other namespace] I
+
+create a new pods in this namespace
+
+kubectl run devi-image nginx
+
+kubectl run dev2-image nginx
+
+kubectl run dev3image nginx
+
+kubectl get pods
+
+
