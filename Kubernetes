@@ -148,8 +148,9 @@ spec:
         image: busybox
         command: ["echo", "Hello from the non-parallel job"]
       restartPolicy: Never
-  completions:3
+  completions: 3
 
+kubectl logs -l job-name=non-parallel-job
 ---------+-------------_-----------------------------&--------------------------__------------
 
 apiVersion: batch/v1
