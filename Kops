@@ -151,4 +151,82 @@ kubectl run dev3image nginx
 
 kubectl get pods
 
+----+++-----------------------------------------------------
+
+Create a namespace in kubernetes :
+
+kubectl create ns dev [use if already exits]
+
+kubectl config set-context-current-namespace-dev
+
+First create a sample serviceaccount here in kubernetes called jack
+
+Create a Serviceaccount--> Create a ROLE(give permissions)--> Role Binding
+
+vi serviceaccount.yml
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: jack
+  namespace: dev
+
+
+kubectl create -f serviceaccount.yml
+
+Create a Role within the dev namespace that allows the user jack to perform certain actions on pods:
+
+vi role.yml
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: dev
+  name: dev-pod-reader
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch"]
+
+kubectl create -f role.yml
+
+Since pods belong to the core API group, we use apiGroups: [""]
+
+Next, bind the pod-reader Role to a user or service account. For simplicity, we'll bind it to a service
+
+account jack:
+
+This RoleBinding binds the pod-reader Role to the jack user, allowing that user to get, list, and watch pods in th dev namespace.
+
+vi rolebinding.yml
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: read-pods
+  namespace: dev
+subjects:
+- kind: User
+  name: jack
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: dev-pod-reader
+  apiGroup: rbac.authorization.k8s.io
+
+kubectl create f rolebinding.yml
+
+Verifying Access
+
+To verify that the jack user has the correct permissions, you can impersonate the user using kubectl:
+
+kubectl auth can-i list pods --namespace=dev --as=jack [answer yes]
+
+kubectl auth can-i create pods --namespace=dev --as=jack [answer no]
+
+kubectl get roles -n dev [List all roles in a namespace:
+
+kubectl describe rolebinding read-pods -n dev
+
+----+++-----------------------------------------------------
 
