@@ -230,3 +230,136 @@ kubectl describe rolebinding read-pods -n dev
 
 ----+++-----------------------------------------------------
 
+Key Concepts of Kubernetes Services:
+
+ClusterIP:
+
+This is the default type of Service. It exposes the Service on a cluster-internal IP. Other services within the same Kubernetes cluster can access the Service, but it is not accessible from outside the cluster.
+
+This creates a connection using an internal Cluster IP address and a Port.
+
+NodePort:
+
+This type of Service exposes the Service on each Node's IP at a static port. A NodePort Service is accessible from outside the cluster by hitting the <NodeIP>: <NodePort>.
+
+When a NodePort is created, kube-proxy exposes a port in the range 30000-32767:
+
+TargetPort:
+
+Pod Container port. Pod's container listens on applicationn port Ex: 80 or 8080, if you dont use this line, K8s will assign default 80 port
+
+kubectl get svc [By default kuberenets will create a default svc]
+
+Let us create a new service
+
+vi service.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ib-deployment
+  labels:
+    app: bank
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      containers:
+      - name: cont1 # Added hyphen list indicator
+        image: trainerreyaz/ib-image:latest
+---
+apiVersion: v1 # Corrected 'apiVersion: v1' placement
+kind: Service
+metadata:
+  name: ib-service
+spec:
+  type: ClusterIP # Corrected 'ClusterIPI' to 'ClusterIP'
+  selector:
+    app: bank
+  ports:
+  - port: 80 # Exposes the service on port 80
+    targetPort: 80 #Pod's container Listens on 80, if you dont use this Sine, Kas will assign tila
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ib-deployment
+  labels:
+    app: bank
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      containers:
+      - name: cont1
+        image: trainerreyaz/ib-image:latest
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ib-service
+spec:
+  type: NodePort
+  selector:
+    app: bank
+  ports:
+  - port: 80
+    targetPort: 80      # Ensure this matches the container's port, if you dont use this line, K8s will assign default
+    nodePort: 31433     # External access via <NodeIP>:31234 Must be in range 30000-32767
+
+Client accesses http://<NodeIP>:31234
+
+Traffic reaches Kubernetes Node on nodePort: 31234
+
+The service forwards it to port: 80 (internal Service port)
+
+Then it forwards the request to targetPort: 80 (inside the Pod's container)
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ib-deployment
+  labels:
+    app: bank
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      containers:
+      - name: cont1
+        image: trainerreyaz/ib-image:latest
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ib-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: bank
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 31433
+
+----+++-----------------------------------------------------
