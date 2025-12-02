@@ -363,9 +363,7 @@ spec:
 ----+++-----------------------------------------------------
 Kubernetes Metric Server also called Heapster
 
-kubectl apply f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/high-availability-
-
-1.21+.yaml:
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/high-availability-1.21+.yaml
 
 kubectl top pods. [Wait for 2 mins]
 
