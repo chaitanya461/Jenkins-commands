@@ -410,7 +410,7 @@ kubectl exec it mb-deployment-85856755c5-c6fb7 -- /bin/bash
 
     apt install stress
 
-    stress-cpu 8-10 4-vm 2vm-bytes 128M-timeout 60s
+    stress --cpu 8 --io 4 --vm 2 --vm-bytes 128M --timeout 60s
 
     exit
 cpu 8: Launches 8 CPU stressors, each consuming 100% CPU by performing continuous computations.
