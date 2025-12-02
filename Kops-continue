@@ -1,0 +1,75 @@
+ENV VARIABLES:
+
+It is a way to pass configuration information to containers running within pods. To set Env vars it include envFrom field in the configuration file.
+
+ENV: Allows you to set environment variables for a container, specifying a value directly for each variable throug CLI/ Command prompt
+
+ENVFROM: PASSING Variables FROM FILE 2 Types, configmaps and secrets
+
+CONFIGMAPS & SECRETS:
+
+D
+
+It is used to store the data in key-value pair, files, or command-line arguments that can be used by pods, containers in cluster.
+
+But the data should be non-confidential. It does not provide security and encryption.
+
+If you want to provide Enryption use Secrets in K8S.
+
+Limit of the configmap is only 1MB
+
+But if you want to store more than 1MB configmap data mount volume or use a separate database or a file service
+
+Example with ENV:
+
+kubectl create deploy newdb-image-mariadb having mariadb]
+
+[This will create a deployment called newdb with single pod
+
+kubectl get pods
+
+kubectl logs newdb-794dd57dbc-tr7s9 [It is crashed because we haven't specified the passsowrd for MariaDB]
+
+kubectl set env deploy newdb MYSQL_ROOT_PASSWORD-root123456
+
+kubectl get pods [ Now it will be in running state, but we are passing password directly from command]
+
+kubectl delete deploy newdb
+
+kubectl create deploy newdb-image-mariadb
+
+kubectl get pods [This will fail because no env variable]
+
+first create secrets, 2 ways to create, from CLI or from File
+
+kubectl create secret generic password--from-literal-ROOT_PASSWORD=reyaz123 (from cli) value literal meaning direct
+
+kubectl create secret generic my-secret-from-env-file=vars (from file)
+
+kubectl get secrets
+
+kubectl describe secret my-secret [Name of the secret is my-secret]
+
+kubectl set env deploy newdb-from-secrets/password
+
+kubectl get pods [This will fail because we have not mention the MYSQL_ prefix]
+
+kubectl set env deploy newdb-from-secret/password--prefix=MYSQL_
+
+without passing prefix we cant make the pod running status
+
+TO SEE SECRETS:
+
+kubectl get secrets password -o yaml
+
+echo -n "LKJSKFHJHi" | base64 -d
+
+or
+
+echo -n "LKJSKFHJHi" base64-decode
+
+kubectl delete deploy newdb
+
+container writes log data to a shared volume, and the sidecar container serves these logs over HTTP using nginx
+
+vi sidecar.yml
