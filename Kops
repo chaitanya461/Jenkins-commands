@@ -546,4 +546,93 @@ spec:
 
 kubectl get pods
  kubectl get quota
+----+++-----------------------------------------------------
 
+PV Persistent Volume
+
+PVC
+
+TO use PV we need to claim the volume using PVC
+
+PVC request a PV with your desired specification(size, access, modes & speed etc) from KBS and once a suitable PV is found it will bound to PVC
+
+After bounding is done to pod you can mount is as a volume
+
+Once user finished work, the attached PV can be released the underlying PV can be reclaimed and recycled for future
+
+if you create volume in cluster, if cluster is delete storage is also deleted. SO use AWS EBS Volumes
+
+First, create a EBS volume in EC2, with 20GB magnetic
+
+kubectl delete ns dev [delete the namespace and come to default]
+
+kubectl config set-context --current --namespace=default
+
+vi pv.yml
+
+apiVersion: v1
+kind: PersistentVolume # Corrected name
+metadata:
+  name: my-pv
+spec:
+  capacity:
+    storage: 20Gi # Corrected value and added unit
+  accessModes:
+  - ReadWriteOnce # Added hyphen list indicator and indentation
+  awsElasticBlockStore:
+    volumeID: vol-0771f0561f66408c9
+    fsType: ext4
+
+
+kubectl create -f pv.yml
+
+kubectl get pv
+
+Now create pvc
+
+vi pvc.yml
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-pvc
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+
+kubectl create -f pvc.yml
+
+vi deploy1.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pvdeploy
+  labels:
+    app: bank
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      containers:
+      - name: cont1
+        image: centos
+        command: ["/bin/bash", "-c", "sleep", "10000"]
+        volumeMounts:
+        - name: my-pv
+          mountPath: "/tmp/persistent"
+      volumes:
+      - name: my-pv
+        persistentVolumeClaim:
+          claimName: my-pvc
+
+----+++-----------------------------------------------------
