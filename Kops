@@ -363,3 +363,187 @@ spec:
     nodePort: 31433
 
 ----+++-----------------------------------------------------
+Kubernetes Metric Server also called Heapster
+
+kubectl apply f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/high-availability-
+
+1.21+.yaml:
+
+kubectl top pods. [Wait for 2 mins]
+
+vi auto.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mb-deployment
+  labels:
+    app: bank
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank # Removed extra period
+    spec:
+      containers:
+      - name: cont1 # Added hyphen list indicator
+        image: reyadocker/mobilebankingrepo:latest 
+
+
+kubectl create -f auto.yml
+
+kubectl get pods
+
+kubectl autoscale deployment mb-deployment --cpu-percent=20 --min=1--max=10
+
+Autoscale deployment called mb-deployment if my cpu is more than 20%, scale out, min 1, max 10
+
+kubectl get hpa [This wil show cpu: 1%/20%, now cpu percent is 1%, it will take time]
+
+Now lets stress the pod by installing stress inside pod, lets connect to pod using exec and install stress.
+
+kubectl get pods
+
+kubectl exec it mb-deployment-85856755c5-c6fb7 -- /bin/bash
+ 
+    apt update
+
+    apt install stress
+
+    stress-cpu 8-10 4-vm 2vm-bytes 128M-timeout 60s
+
+    exit
+cpu 8: Launches 8 CPU stressors, each consuming 100% CPU by performing continuous computations.
+
+--io 4: Initiates 4 I/O stressors, each generating continuous 1/0 operations to stress the system's disk and filesystem.
+
+--vm 2: Starts 2 virtual memory stressors, each allocating and deallocating memory repeatedly to test the system's memory management.
+
+--vm-bytes 128M: Specifies that each virtual memory stressor should allocate 128 megabytes of memory.
+
+--timeout 60s: Sets the duration of the stress test to 60 seconds, after which all stressors will terminate.
+
+On main server
+
+kubectl top pods
+
+kubectl get hpa
+
+kubectl get pods.
+
+kubectl describe hpa mb-deployment [ This will show scaling activities ]
+
+kubectl get events     [This will also show same things ]
+
+kubectl logs mb-deployment-8585b755c5-p2bzv [To see logs of the pod]
+
+After few mins, scale in happens as we dont have load.
+
+kubectl delete -f auto.yml
+
+Example using Manifestfile
+
+First we need to have deployment and then we can autscale on that deployment / deployment name
+
+vi auto.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ib-deployment
+  labels:
+    app: bank
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      containers:
+      - name: cont1
+        image: reyadocker/internetbankingrepo:latest
+
+kubectl apply -f auto.yml
+
+vi hpa.yml
+
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ib-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ib-deployment
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 20
+
+----+++-----------------------------------------------------
+
+Resource Quota:
+
+kubectl create ns dev
+
+kubectl config set-context --current --namespace=dev
+
+kubectl config view [To see which namespace we are using]
+
+vi dev-quota.yml
+
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: dev-quota
+  namespace: dev
+spec:
+  hard:
+    pods: "5"
+    limits.cpu: "1"
+    limits.memory: 1Gi
+
+vi deploy1.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ib-deployment
+  labels:
+    app: bank
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      containers:
+      - name: cont1
+        image: reyadocker/internetbankingrepo:latest
+        resources:
+          limits:
+            cpu: "0.3"
+            memory: 320Mi
+
+
+kubectl get pods
+ kubectl get quota
+
