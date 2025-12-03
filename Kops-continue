@@ -298,6 +298,10 @@ spec:
       - name: cont1
         image: nginx
 
+kubectl get nodes
+
+kubectl edit node node-name
+
 kubectl apply -f nodeselector.yml
 
 kubectl get pods
