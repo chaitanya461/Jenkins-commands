@@ -80,3 +80,102 @@ create app --> Application Name -->bankapp Project Name -> default --> Sync Poli
 
 NameSpace -->default 
 
+-----------------------------------------------------------
+
+--Launch Amazonlinux2 instance call as Promotheus&Grafana Server, from this server we will create K8S CLuster and monitor all those
+
+--Setup KOPS cluster first amazon Linux 2
+
+Install HELM:
+
+curl -fsSL -b get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+
+chmod 700 get_helm.sh
+
+./get_helm.sh
+
+helm version
+
+Install Metric Server:
+
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/high-availability-1.21+.yaml
+
+Steps to Install Prometheus:
+
+--First add repositories
+
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+
+helm repo add grafana https://grafana.github.io/helm-charts
+
+UPDATE HELM CHART REPOS:
+
+helm repo update
+
+helm repo list
+
+CREATE PROMETHEUS NAMESPACE:
+
+kubectl get ins
+
+kubectl create --namespace prometheus
+
+kubectl get ns
+
+INSTALL PROMETHEUS:
+
+helm install prometheus prometheus-community/prometheus-namespace prometheus--set
+
+alertmanager.persistentVolume.storageClass="gp2" --set server.persistentVolume.storageClass="gp2"
+
+kubectl get pods n prometheus
+
+kubectl get all n prometheus
+
+Create Namespace Grafana:
+
+kubectl create namespace grafana
+
+Install Grafana:
+
+helm install grafana grafana/grafana-namespace grafana-set persistence.storageClassName="gp2" --set
+
+persistence.enabled-true-set adminPassword='Root123456'set service.type-Load Balancer
+
+kubectl get pods -n grafana
+
+kubectl get service -n grafana
+
+--Copy the Instance IP:3000 and paste in browser
+
+--username:admin, password Root123456
+
+--Check SG, nodes and ELB
+
+--Go to Grafana Dashboard-> Add the DataSource--> Select Prometheus and below URL, this URL is same in K8s for all
+
+http://prometheus-server.prometheus.svc.cluster.local/
+
+--https://grafana.com/grafana/dashboards/
+
+--all dashboard id's are here
+
+--Import Grafana dashboard New Import 6417 load
+
+--select Prometheus
+
+import grafana dashboard -->New-> Import -> 315 -->load --> select Prometheus -->import
+
+--Add 1860 port to monitor Nodes individually
+
+11454--> pv and pvc
+
+747-> pod metrics
+
+14623 k8s overview use this
+
+10907 monitor api-server
+
+--to start grafana service or see in script.  
+systemctl start grafana-server.service
+
