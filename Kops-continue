@@ -404,3 +404,64 @@ spec:
         ports:
         - containerPort: 80
 
+TAINTS and TOLERANCE:
+
+--In Kubernetes, taints and tolerations work together to control the scheduling of Pods onto Nodes. Taints are applied to Nodes to prevent certain Pods from being scheduled on them, while tolerations are applied to Pods to allow them to be scheduled on Nodes with matching taints.
+
+Example Scenario: Dedicated Nodes for Specific Workloads
+
+--Suppose you have a Kubernetes cluster with Nodes equipped with specialized hardware, such as GPUs, intended exclusively for machine learning workloads. To ensure that only Pods requiring GPU resources are scheduled on these Nodes, you can use taints and tolerations. I
+
+kubectl edit node 1-0e6b67bf1b00383be [Edit control plane, this master node has taint no schedule, thats the reason master node will not have pods]
+
+--Apply Taint to GPU Nodes
+
+--First, taint the GPU Nodes to repel/force Pods that do not require GPU resources:
+
+kubectl taint nodes 1-0333b24c25bf4868b hardware=gpu:NoSchedule
+
+--This command adds a taint with key hardware, value gpu, and effect NoSchedule to the specified Node. As a result, Pods without a matching toleration will not be scheduled on this Node.
+
+--Lets test:
+
+vi deploy.yml
+same deploy yml file
+
+vi toleration:
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ib-deployment
+  labels:
+    app: bank
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      containers:
+        - name: conti
+          image: reyadocker/internetbankingrepo:latest
+      tolerations:
+        - key: "hardware"
+          operator: "Equal"
+          value: "gpu"
+          effect: "NoSchedule"
+
+--In this Pod specification, the toleration matches the taint applied to the GPU Nodes, permitting the Pod scheduled on those Nodes.
+
+Key Points:
+
+--Taints are applied to Nodes to repel certain Pods. They consist of a key, value, and effect (NoSchedule, PreferNoSchedule, or NoExecute).
+
+--Tolerations are applied to Pods to allow them to be scheduled on Nodes with matching taints. They must match the key, value, and effect of the taint to be effective.
+
+--Pod Affinity
+
+--Pod affinity allows users to specify which pods a pod should or should not be scheduled with based on labels. For example, you can use pod affinity to specify that a pod should be scheduled on the same node as other pods with a specific label, such as app-database.
+
