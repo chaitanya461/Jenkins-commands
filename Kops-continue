@@ -232,14 +232,14 @@ spec:
   rules:
   - http:
       paths:
-      - path: /nginx(/.*)(.*)
+      - path: /nginx(/|$)(.*)
         pathType: ImplementationSpecific
         backend:
           service:
             name: nginx
             port:
               number: 80
-      - path: /httpd(/.*)(.*)
+      - path: /httpd(/|$)(.*)
         pathType: ImplementationSpecific
         backend:
           service:
