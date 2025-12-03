@@ -33,7 +33,7 @@ wq!
 
 sh kops.sh
 
-export KOPS_STATE_STORE=s3://reyaz-kops-testbkt143333.k8s.local
+export KOPS_STATE_STORE=s3://reyaz-kops-testbkt143333181.k8s.local
 
 kops validate cluster --wait 10m
 
