@@ -66,3 +66,17 @@ kubectl get svc argocd-server -n argocdo json jq-raw-output status.loadBalancer.
 
 --The above command will provide load balancer URL to access ARGO CD
 
+TO GET ARGO CD PASSWORD:
+
+kubectl -n argocd get secret argocd-initial-admin-secreto jsonpath="(.data.password}" base64-d
+
+Open ArgoCD load balancer
+
+username: admin and password from above command
+
+create app --> Application Name -->bankapp Project Name -> default --> Sync Policy Automatic Repository
+
+--> https://github.com/ReyazShaik/ar-deploy.git --> Path --/-- CLuster URL -->
+
+NameSpace -->default 
+
