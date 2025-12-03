@@ -142,7 +142,7 @@ kubectl get pods -n grafana
 
 kubectl get service -n grafana
 
---Copy the Instance IP:3000 and paste in browser
+--Copy the Instance IP:3000 and paste in browser or elb
 
 --username:admin, password Root123456
 
