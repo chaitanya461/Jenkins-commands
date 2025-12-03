@@ -255,3 +255,152 @@ spec:
               number: 80
 
 ---------------------------------------_---------------------------------------------
+
+PODS SCHEDULING:
+
+In Kubernetes, Node Selector, Node Affinity, Taints and Tolerations and are mechanisms that influence how Pods are scheduled onto Nodes within a cluster.
+
+Node Selector
+
+Node Affinity
+
+Taints and Tolerations
+
+1. Node Selector:
+
+NodeSelector is the simplest form of node selection constraint, allowing Pods to be scheduled only on Nodes with specific labels. By specifying a NodeSelector in a Pod's specification, you can ensure that the Pod runs only on Nodes that match the given label criteria.
+
+NodeSelector: Use when you have simple, specific constraints for Pod placement based on Node labels
+
+In the below manifest file, we are creating 2 pods and those pods should be scheduled in ib-node labeled node.
+
+vi nodeselector.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ib-deployment
+  labels:
+    app: bank
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      nodeSelector:
+        node-name: ib-node
+      containers:
+      - name: cont1
+        image: nginx
+
+kubectl apply -f nodeselector.yml
+
+kubectl get pods
+
+--Pods are not getting created because there is no label to the node called node-name: th-node
+
+kubectl describe pod ib-deployment-7784c9bfb5-8s18d
+
+--Warning FailedScheduling 2m40s default-scheduler 0/3 nodes are available: 1 node(s) had untolerated taint (node-role.kubernetes.io/control-plane:), 2 node(s) didn't match Pod's node affinity/selector. preemption: 0/3 nodes. are available: 3 Preemption is not helpful for scheduling.
+
+kubectl get nodes
+
+kubectl edit node 1-043783332483bf9f8
+
+--under labels add -node-name: ib-node / We can use command also "kubectl label nodes 1-043783332483bf9f8
+
+node-name-ib-node
+
+kubectl get pods  --Now pods are running
+
+--we are forcing kube-schedular to schedule pod on particular node. Its hard match. If it doesn't match, Kube scheduler will not schedule the pod so pod will be in pending state
+
+kubectl delete deploy ib-deployment
+
+2: Node Affinity:
+
+Node Affinity is a more expressive way to specify rules about the placement of pods relative to nodes' labels. It allows you to specify rules that apply only if certain conditions are met. Same as Node Selector but this has flexible way, if matches do it, if not schedule pod on any another node.
+
+Two types
+
+1.Preferred during scheduling Ignore during execution (soft rules) good if happen
+
+2. Required during scheduling Ignore during execution (hard rules) Must happen Same as NodeSelector
+
+The node affinity syntax supports the following operators: In, NotIn, Exists, DoesNotExist, Gt, Lt, etc.
+
+Preferred:
+
+vi preferred.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ib-deployment
+  labels:
+    app: bank
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            preference:
+              matchExpressions:
+              - key: node-name
+                operator: In
+                values:
+                - mb-node
+      containers:
+      - name: nginx
+        image: nginx
+        ports:
+        - containerPort: 80
+
+Required:
+
+vi required.yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ib-deployment
+  labels:
+    app: bank
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-name
+                operator: In
+                values:
+                - mb-node
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+
