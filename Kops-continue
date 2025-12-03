@@ -22,7 +22,7 @@ But if you want to store more than 1MB configmap data mount volume or use a sepa
 
 Example with ENV:
 
-kubectl create deploy newdb-image-mariadb having mariadb]
+kubectl create deploy newdb --image=mariadb    [ having mariadb]
 
 [This will create a deployment called newdb with single pod
 
@@ -40,9 +40,17 @@ kubectl create deploy newdb-image-mariadb
 
 kubectl get pods [This will fail because no env variable]
 
+vi var
+MYSQL_ROOT_PASSWORD=root123456
+MYSQL_ROOT_User=root123456
+
+kubectl create cm dbvars --from-env-file=vars
+
+kubectl set env deploy newdb --from=configmaps/dbvars
+
 first create secrets, 2 ways to create, from CLI or from File
 
-kubectl create secret generic password--from-literal-ROOT_PASSWORD=reyaz123 (from cli) value literal meaning direct
+kubectl create secret generic password --from-literal=ROOT_PASSWORD=reyaz123 (from cli) value literal meaning direct
 
 kubectl create secret generic my-secret-from-env-file=vars (from file)
 
@@ -50,11 +58,11 @@ kubectl get secrets
 
 kubectl describe secret my-secret [Name of the secret is my-secret]
 
-kubectl set env deploy newdb-from-secrets/password
+kubectl set env deploy newdb --from=secrets/password
 
 kubectl get pods [This will fail because we have not mention the MYSQL_ prefix]
 
-kubectl set env deploy newdb-from-secret/password--prefix=MYSQL_
+kubectl set env deploy newdb --from=secret/password --prefix=MYSQL_
 
 without passing prefix we cant make the pod running status
 
