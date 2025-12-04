@@ -108,7 +108,7 @@ sudo systemctl start prometheus && sudo systemctl status prometheus --no-pager
 
 #GRAFANA
 
-wget -q -o gpg.key https://rpm.grafana.com/gpg.key
+wget -q -O gpg.key https://rpm.grafana.com/gpg.key
 sudo rpm --import gpg.key
 sudo cat <<EOF | tee /etc/yum.repos.d/grafana.repo
 [grafana]
