@@ -265,12 +265,13 @@ vi /etc/grafana/grafana.ini line 892/1034
 [smtp]
 enabled=true
 host=smtp.gmail.com:587
-user=trainerreyaz@gmail.com
-#If the password contains #or; you have to wrap it with triple quotes. Ex """#pa 897 password=xhfa drlb zgwm ogey
+user=saipureddysai17@gmail.com
+#If the password contains #or; you have to wrap it with triple quotes. Ex """#pa 897 
+password=okss favh rcdq ebip
 cert_file=
 ;key_file=
 skip_verify=true
-from_address=chaitanya@gmail.com
+from_address=saipureddysai17@gmail.com
 from_name=Grafana
 
 ---
