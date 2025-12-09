@@ -1,0 +1,138 @@
+sudo dnf update -y
+
+sudo dnf install -y dnf-plugins-core
+
+sudo dnf config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
+
+sudo dnf -y install terraform
+
+terraform --version
+
+
+variable "fruits"{
+type = list(string)
+default = ["apple","mango","banna"]
+}
+
+output "list_length"{
+value = length(var.fruits)
+}
+
+output "joined_string"{
+value = join(", ",var.fruits)
+}
+
+variable "vegis"{
+type = list
+default = ["onions","tomatoes"]
+}
+
+output "sample"{
+value = concat(var.fruits,var.vegis)
+}
+
+variable "keys"{
+type = list
+default = ["name","age"]
+}
+
+variable "value"{
+type = list
+default = ["sai","24"]
+}
+
+output "my_map"{
+value = zipmap(var.keys,var.value)
+}
+
+variable "map1"{
+type = map(string)
+default = {"name" = "sai", "age" = "24"}
+}
+
+
+output "values1"{
+value = lookup(var.map1,"name")
+}
+
+variable "unique_name"{
+type = set(string)
+default = ["Alice","Bob","Charlie","Bob"]
+}
+
+output "unique_name_list"{
+value = tolist(var.unique_name)
+}
+
+
+variable "instance_tags" {
+  type = map(string)
+  default = {
+    Name = "webserver"
+    Env  = "Production"
+  }
+}
+
+output "instange_tags" {
+  value = var.instance_tags
+}
+
+output "instance_name" {
+  value = var.instance_tags["Name"]
+}
+
+output "keys" {
+  value = keys(var.instance_tags)
+}
+
+output "values" {
+  value = values(var.instance_tags)
+}
+
+
+--------------------------------------------------------------------------------
+create resource with variables and .tfvars
+
+vi main.tf
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "instance" {
+  count         = var.instance_count
+  ami           = "ami-00ca570c1b6d79f36"
+  instance_type = var.instance_type
+  tags = {
+    Name = var.instance_name
+  }
+}
+
+vi variables.tf
+
+variable "instance_count" {
+  type = number
+}
+
+variable "instance_type" {
+  type = string
+}
+
+variable "instance_name" {
+  type = string
+}
+
+vi terraform.tfvars
+
+instance_count = 1
+instance_type  = "t3.micro"
+instance_name  = "dev"
+
+
+cp terraform.tfvars dev.tfvars
+
+cp terraform.tfvars prod.tfvars
+
+terraform plan -var-file=prod.tfvars
+
+terraform apply --auto-approve -var-file=prod.tfvars
