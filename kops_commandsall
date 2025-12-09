@@ -1,0 +1,199 @@
+kops validate cluster --wait 10m
+   51  kops get cluster
+   52  kubectl get nodes/no
+   53  kubectl get nodes
+   54  kubectl get pods
+   55  kubectl get ns
+   56  kubectl create ns dev
+   57  kubectl get ns
+   58  kubectl config set-context --current --namespace=dev
+   59  kubectl config view
+   60  kubectl run pod1 --image=nginx
+   61  kubectl get pods
+   62  kubectl get pods -o wide
+   63  kubectl describe pod pod1
+   64  kubectl log pod1
+   65  kubectl logs pod1
+   66  kubectl delete pod pod1
+   67  kubectl get pods
+   68  kubectl run pod1 --image=nginx
+   69  kubectl config set-context --current --namespace=default
+   70  kubectl get pods -n dev
+   71  kubectl delete pod -n dev
+   72  kubectl delete pod pod1 -n dev
+   73  kubectl config set-context --current --namespace=dev
+   74  vi serviceaccount.yml
+   75  kubectl create -f serviceaccount.yml
+   76  vi role.yml
+   77  kubectl create -f role.yml
+   78  vi rolebinding.yml
+   79  kubectl create -f rolebinding.yml
+   80  kubectl auth can-i list pod --namespace=dev --as=jack
+   81  kubectl auth can-i get pod --namespace=dev --as=jack
+   82  kubectl auth can-i watch pod --namespace=dev --as=jack
+   83  kubectl auth can-i create pod --namespace=dev --as=jack
+   84  kubectl run pod2 --image=nginx
+   85  kubectl config view
+   86  kubectl get roles -n dev
+   87  kubectl describe rolebinding read-pods -n dev
+   88  kubectl delete pod pod2
+   89  kubectl delete -f serviceaccount.yml
+   90  kubectl delete -f role.yml
+   91  kubectl delete -f rolebinding.yml
+   92  ls
+   93  rm -rf *.yml
+   94  ls
+   95  kubectl config set-context --current --namespace=default
+   96  kucectl get ns
+   97  kubectl get ns
+   98  vi daemonSet
+   99  vi daemonSet.yml
+  100  kubectl create -f daemonSet.yml
+  101  kubectl api-versions
+  102  vi daemonSet.yml
+  103  kubectl create -f daemonSet.yml
+  104  kubectl get ds
+  105  kubectl get ds --namespace=dev
+  106  kubectl get ds --namespace=default
+  107  kubectl get ds -n default
+  108  kubectl get pods
+  109  kubectl get pods -o wide
+  110  kubectl delete -f daemonSet.yml
+  111  vi service.yml
+  112  kubectl create -f service.yml
+  113  kubectl get svc
+  114  kubectl get deploy
+  115  kubectl get pods -o wide
+  116  kubectl describe svc ib-service
+  117  kubectl delete -f service.yml
+  118  vi nodeport.yml
+  119  kubectl create -f nodeport.yml
+  120  kubectl get svc
+  121  kubectl describe svc ib-service
+  122  kubectl get pods
+  123  kubectl exec -it ib-deployment -- /bin/bash
+  124  kubectl exec -it cont1 -- /bin/bash
+  125  kubectl delete -f  nodeport.yml
+  126  kubectl get pods
+  127  vi lb.yml
+  128  kubectl create -f lb.yml
+  129  kubectl get svc
+  130  kubectl get deploy
+  131  kubectl get pods
+  132  kubectl describe svc ib-service
+  133  kubectl logs ib-deployment-77d86df4b4-fqkwc
+  134  kubectl delete -f lb.yml
+  135  kubectl apply f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/high-availability-1.21+.yaml
+  136  kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/high-availability-1.21+.yaml
+  137  ls
+  138  kubectl top pods
+  139  kubectl get hpa
+  140  vi auto.yml
+  141  kubectl create -f auto.yml
+  142  kubectl get pods
+  143  kubectl get hpa
+  144  kubectl autoscale deploy mb-deployment --cpu-percent=20 --min=1 --max=10
+  145  kubectl exec -it mb-deployment-77d86df4b4-kgsxg -- /bin/bash
+  146  kubectl get pods
+  147  kubectl get hpa
+  148  kubectl get events
+  149  kubectl delete -f auto.yml
+  150  kubectl get pods
+  151  kubectl create -f auto.yml
+  152  vi hpa.yml
+  153  kubectl create -f hpa.yml
+  154  kubectl get pods
+  155  kubectl delete -f auto.yml
+  156  kubectl delete -f hpa.yml
+  157  vi dev-quota.yml
+  158  kubectl create -f dev-quota.yml
+  159  vi deploy1.yml
+  160  kubectl create -f deploy1.yml
+  161  kubectl get pods
+  162  kubectl get quota
+  163  kubectl get quota
+  164  kubectl run reyaz --image=nginx
+  165  kubectl run reyaz1 --image=nginx
+  166  kubectl run reyaz4 --image=nginx
+  167  kubectl config view
+  168  kubectl delete -f dev-quota.yml
+  169  kubectl delete -f deploy1.yml
+  170  kubectl config set-context --current --namespace=dev
+  171  kubectl config view
+  172  vi dev-quota.yml
+  173  kubectl create -f dev-quota.yml
+  174  vi deploy1.yml
+  175  kubectl create -f deploy1.yml
+  176  kubectl get pods
+  177  kubectl run pod1 --image=nginx
+  178  kubectl delete -f deploy1.yml
+  179  kubectl delete -f dev-quota.yml
+  180  kubectl config set-context --current --namespace=default
+  181  vi pv.yml
+  182  kubectl create -f pv.yml
+  183  vi pvc.yml
+  184  kubectl create -f pvc.yml
+  185  vi deploy2.yml
+  186  kubectl create -f deploy2.yml
+  187  kubectl get pods
+  188  kubectl delete pod reyaz
+  189  kubectl delete pod reyaz1
+  190  kubectl delete pod reyaz4
+  191  vi deploy2.yml
+  192  kubectl get pods
+  193  kubectl logs pvdeploy-7c9755f4df-285hx
+  194  vi deploy2.yml
+  195  kubectl apply -f deploy2.yml
+  196  kubectl create -f deploy2.yml
+  197  kubectl get pods
+  198  vi deploy2.yml
+  199  kubectl apply -f deploy2.yml
+  200  kubectl get pods
+  201  kubectl get pods
+  202  vi deploy2.yml
+  203  kubectl apply -f deploy2.yml
+  204  kubectl get pods
+  205  kubectl get pods
+  206  kubectl exec -it pvdeploy-864f45dbb9-qmfw5 -- /bin/bash
+  207  kubectl delete pod pvdeploy-864f45dbb9-qmfw5
+  208  kubectl get pods
+  209  kubectl delete pod pvdeploy-864f45dbb9-p7tzh
+  210  ls
+  211  kubectl get pods
+  212  kubectl exec -it pvdeploy-864f45dbb9-j7sgf -- /bin/bash
+  213  kubectl delete pod pvdeploy-864f45dbb9-p7tzh
+  214  kubectl get pods
+  215  kubectl get pods pvdeploy-864f45dbb9-j7sgf
+  216  kubectl delete pod pvdeploy-864f45dbb9-j7sgf
+  217  kubectl get pods
+  218  kubectl exec -it pvdeploy-864f45dbb9-rkbjn  -- /bin/bash
+  219  --------------------------------------------------------------------
+kubectl create deploy newdb --image=mariadb
+   32  kubectl get pods
+   33  kubectl get pods
+   34  kubectl set env deploy newdb MARIADB_ROOT_PASSWORD=root12456
+   35  kubectl get pods
+   36  kubectl get pods
+   37  kubectl get pods
+   38  kubectl get pods
+   39  kubectl delete deploy newdb
+   40  vi vars
+   41  kubectl create deploy newdb --image=mariadb
+   42  kubectl get pods
+   43  kubectl create cm dbvars --from-env-file=vars
+   44  kubectl set env deploy newdb -from=configmaps/dbvars
+   45  kubectl set env deploy newdb --from=configmaps/dbvars
+   46  kubectl get pods
+   47  kubectl delete deploy newdb
+   48  kubectl create deploy newdb --image=mariadb
+   49  kubectl create cm dbvars --from-env-file=vars
+   50  kubectl create cm dbvar --from-env-file=vars
+   51  kubectl set env deploy newdb --from=configmaps/dbvar
+   52  kubectl get pods
+   53  kubectl describe cm dbvar
+   54  kubectl delete deploy newdb
+   55  kubectl create deploy newdb --image=mariadb
+   56  kubectl create secret generic dbvar1 --from-env-file=var
+   57  kubectl create secret generic dbvar1 --from-env-file=vars
+   58  kubectl set env deploy newdb --from=secret/dbvar1
+   59  kubectl get pods
