@@ -1,0 +1,202 @@
+vi minkube.sh
+    3  kubectl get pods -w
+    4  ls
+    5  vi minkube.sh
+    6  sh minkube.sh 
+    7  kubectl get pods
+    8  ls
+    9  kubectl get nodes
+   10  kubectl run pod1 --image nginx
+   11  kubectl get pods
+   12  kubectl get pods -o wide
+   13  kubectl describe pod pod1 
+   14  clear
+   15  kubectl log pod1
+   16  kubectl logs pod1
+   17  kubectl exec -it pod1 -- /bin/bash
+   18  kubectl delete pod pod1
+   19  kubectl history
+   20  kubectl histry
+   21  history
+   22  kubectl api-version
+   23  kubectl api-versions
+   24  vi pod2.yml
+   25  kubectl create -f pod2.yml 
+   26  vi pod2.yml
+   27  kubectl create -f pod2.yml 
+   28  kubectl get pods
+   29  kubectl get pods -o wide
+   30  kubectl describe pod pod1
+   31  kubectl logs pod2
+   32  kubectl exec -it pod2 -- /bin/bash
+   33  kubectl delete pod pod2
+   34  kubectl api-versions
+   35  vi replicaSet.yml
+   36  kubectl create -f replicaSet.yml 
+   37  vi replicaSet.yml
+   38  kubectl create -f replicaSet.yml 
+   39  kubectl get pods
+   40  vi replicaSet.yml
+   41  kubectl create -f replicaSet.yml 
+   42  kubectl apply -f replicaSet.yml 
+   43  kubectl get pods
+   44  vi replicaSet.yml
+   45  kubectl delete -f replicaSet.yml 
+   46  vi replicaSet.yml
+   47  kubectl apply -f replicaSet.yml 
+   48  kubectl get pods
+   49  kubectl get pods -o wide
+   50  kubectl scale rs/ib-rs --replicas=5
+   51  kubectl scale rs/ib-r5 --replicas=5
+   52  kubectl get pods
+   53  kubectl scale rs/ib-r5 --replicas=1
+   54  kubectl get pods
+   55  kubectl delete -f replicaSet.yml 
+   56  kubectl get pods
+   57  vi deploy1.yml
+   58  kubectl create -f deploy1.yml 
+   59  kubectl get pods
+   60  kubectl get pods --show-lables
+   61  kubectl get pods -l app: bank
+   62  kubectl get pods --show-labels
+   63  kubectl scale deploy/ib-r5 --replicas=6
+   64  kubectl get pods
+   65  kubectl rollout undo deploy/ib-r5
+   66  kubectl scale deploy/ib-r5 --replicas=2
+   67  kubectl rollout undo deploy/ib-r5
+   68  kubectl get events
+   69  kubectl rollout undo deploy/ib-r5
+   70  kubectl scale deploy/ib-r5 --replicas=17
+   71  kubectl scale deploy/ib-r5 --replicas=4
+   72  kubectl scale deploy/ib-r5 --replicas=1
+   73  kubectl rollout undo deploy/ib-r5
+   74  kubectl rollout history deployment/ib-r5
+   75  kubectl get deploy
+   76  kubectl roll status deploy/ib-r5
+   77  kubectl rollout status deploy/ib-r5
+   78  kubectl get pods
+   79  kubectl rollout undo deploy/ib-r5
+   80  kubectl get pods
+   81  vi deploy1.yml 
+   82  kubectl apply -f deploy1.yml 
+   83  kubectl get pods
+   84  kubectl get deploy
+   85  kubectl scale deploy/ib-r4 --replicas=7
+   86  kubectl get deploy ib-r4
+   87  kubectl scale deploy/ib-r4 --replicas=5
+   88  kubectl get deploy ib-r4
+   89  kubectl scale deploy/ib-r4 --replicas=6
+   90  kubectl rollout undo deploy/ib-r4
+   91  kubectl rollout history deployment/ib-r4
+   92  kubectl rollout resume deploy/ib-r4
+   93  kubectl rollout undo deploy/ib-r4
+   94  kubectl get pods
+   95  kubectl delete pod ib-r4-7cc8475885-f7kbr 
+   96  kubectl get pods
+   97  kubectl describe pod -l app=bank | grep -i image
+   98  kubectl edit deploy/ib-r4
+   99  kubectl get pods
+  100  kubectl edit deploy/ib-r4
+  101  kubectl get pods
+  102  kubectl edit deploy/ib-r4
+  103  kubectl get pods
+  104  kubectl edit deploy/ib-r4
+  105  kubectl get pods
+  106  kubectl rollout undo deploy/ib-r4
+  107  kubectl get pods
+  108  kubectl rollout depoly/ib-r4
+  109  kubectl rollout deploy/ib-r4
+  110  kubectl rollout undo deploy/ib-r4
+  111  kubectl get pods
+  112  kubectl edit deploy/ib-r4
+  113  kubectl get pods
+  114  kubectl deplete -f deploy1.yml 
+  115  kubectl delete -f deploy1.yml 
+  116  kubectl get pods
+  117  kubectl delete pod ib-r5-7cc8475885-wllxs
+  118  kubectl get pods
+  119  ls
+  120  kubectl delete -f pod2.yml
+  121  kubectl delete -f replicaSet.yml 
+  122  kubectl delete -f deploy1.yml 
+  123  kubectl get pods --show-labels
+  124  kubectl describe pod ib-r5-7cc8475885-s92rm 
+  125  ls
+  126  vi multi.yml
+  127  kubectl create -f multi.yml 
+  128  kubectl get pods
+  129  kubectl logs pod two-container-pod  -c nginx-container
+  130  kubectl logs two-container-pod  -c nginx-container
+  131  kubectl logs two-container-pod -c busybox-container
+  132  kubectl delete -f multi.yml 
+  133  kubectl get pods
+  134  vi nonparallel.yml
+  135  kubectl create -f nonparallel.yml 
+  136  vi nonparallel.yml
+  137  kubectl create -f nonparallel.yml 
+  138  kubectl get pods
+  139  kubbectl log non-parallel-job
+  140  kubectl log non-parallel-job
+  141  kubectl logs non-parallel-job
+  142  kubectl get pods -o wide
+  143  kubectl describe pod non-parallel-job
+  144  kubectl delete -f nonparallel.yml 
+  145  vi nonparallel.yml 
+  146  kubectl create -f nonparallel.yml 
+  147  kubectl get pods
+  148  kubectl delete -f nonparallel.yml 
+  149  vi conjob.yml
+  150  kubectl create -f conjob.yml 
+  151  kubectl get pods
+  152  kubectl describe pod hello-cronjob-29409808-qk742 
+  153  kubectl get pods
+  154  kubectl describe pod ib-r5-7cc8475885-s92rm 
+  155  kubectl get pods
+  156  kubectl describe pod hello-cronjob-29409808-qk742 
+  157  kubectl logs hello-cronjob-29409808-qk742
+  158  kubectl get pods
+  159  kubectl logs non-parallel-job
+  160  vi conjob.yml
+  161  kubectl apply -f conjob.yml 
+  162  kubectl get pods
+  163  kubectl get pods
+  164  vi parallel.yml
+  165  kubectl logs -l job-name=non-parallel
+  166  kubectl logs -l job-name=non-parallel-job
+  167  kubectl create -f parallel.yml 
+  168  kubectl get pods
+  169  kubectl log -l job-name=parallel-fixed-count-job
+  170  kubectl logs -l job-name=parallel-fixed-count-job
+  171  kubectl delete -f nonparallel.yml 
+  172  kubectl delete -f parallel.yml 
+  173  kubectl get pods
+  174  kubectl apply -f parallel.yml 
+  175  kubectl get pods
+  176  kubectl delete -f conjob.yml 
+  177  kubectl delect -f parallel.yml 
+  178  kubectl delete -f parallel.yml 
+  179  kubectl get pods
+  180  kubectl get jobs
+  181  kubectl delete -f conjob.yml
+  182  ls
+  183  kubectl get conjob
+  184  kubectl get cronjobs
+  185  kubectl delete -f nonparallel.yml 
+  186  kubectl delete -f parallel.yml 
+  187  kubectl apply -f conjob.yml 
+  188  kubectl get pogs
+  189  kubectl get pods
+  190  vi conjob.yml 
+  191  kubectl delete -f conjob.yml 
+  192  vi cron.yml
+  193  kubectl apply -f cron.yml 
+  194  kubectl create -f cron.yml 
+  195  kubectl get pods
+  196  kubectl delete pod all
+  197  kubectl delete all
+  198  kubectl delete -f cron.yml 
+  199  kubectl get pods
+  200  vi cron.yml 
+  201  kubectl create -f cron.yml 
+  202  kubectl get pods
+  203  kubectl get jobs
