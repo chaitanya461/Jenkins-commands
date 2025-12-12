@@ -1,3 +1,4 @@
+
 sudo dnf update -y
 
 sudo dnf install -y dnf-plugins-core
@@ -136,3 +137,969 @@ cp terraform.tfvars prod.tfvars
 terraform plan -var-file=prod.tfvars
 
 terraform apply --auto-approve -var-file=prod.tfvars
+--------------------------------------------------------------------------------------------------------
+creating a s3 bucket 
+vi terraform.tfvars
+
+mybucket = "tf-example-sai-s4-buck"
+
+vi variables.tf
+
+variable "mybucket" {
+  type    = string
+  default = ""
+}
+
+vi main.tf
+
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "6.25.0"
+    }
+  }
+}
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_s3_bucket" "example" {
+  bucket = var.mybucket
+}
+
+----------------------------------------------------------------------------------------------
+Creating a aws_instance
+
+vi terraform.tfvars
+
+instance_ami  = "ami-00ca570c1b6d79f36"
+instance_type = "t3.micro"
+key_name      = "mumbaikops-keypair"
+name          = "Myinstance"
+
+
+vi variable.tf
+
+variable "instance_ami" {
+  type = string
+}
+
+variable "instance_type" {
+  type = string
+}
+
+variable "key_name" {
+  type = string
+}
+
+variable "name" {
+  type = string
+}
+
+
+vi main.tf
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+
+resource "aws_instance" "myinstance" {
+  ami           = var.instance_ami
+  instance_type = var.instance_type
+  key_name      = var.key_name
+  tags = {
+    Name = var.name
+  }
+}
+
+output "instance_public_id" {
+  value = aws_instance.myinstance.public_ip
+
+}
+
+output "instance_id" {
+  value = aws_instance.myinstance.id
+}
+
+
+output "instance_public_dns" {
+  value = aws_instance.myinstance.public_dns
+}
+
+----------------------------------------------------------------------------------------------
+
+taint : it is used to create specific resource in infrastructure
+
+use same above code add these 
+
+resource "aws_s3_bucket" "mybucket" {
+  bucket = "test-bkt-satya"
+}
+
+
+terraform fmt
+
+terrraformt init
+
+terraform validate
+
+terraform plan
+
+terraform apply --auto-approve
+
+terraform state list
+
+terraform taint aws_s3_bucket.mybucket
+
+------------------------------------------------------------------------------------------------------------------
+
+local varible:
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+
+locals {
+  project_name   = "My-Awssome"
+  environment    = "Student"
+  instance_count = 2
+  tags = {
+    Name = "${local.project_name}-${local.environment}"
+    Env  = "${local.environment}"
+  }
+}
+
+resource "aws_instance" "local_example" {
+  ami           = "ami-00ca570c1b6d79f36"
+  instance type = "t3.micro"
+  count         = local.instance_count
+  tags          = local.tags
+}
+
+
+output "instance_ids" {
+  value = aws_instance.local_example[*].id
+}
+
+-------------------------------------------------------------------------------------
+
+creating with vpc
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+locals {
+  env = "Prod"
+}
+resource "aws_vpc" "myvpc" {
+  cidr_block = "192.168.0.0/16"
+  tags = {
+    Name = "${local.env}-Vpc"
+  }
+}
+
+resource "aws_subnet" "subnet1" {
+  vpc_id            = aws_vpc.myvpc.id
+  cidr_block        = "192.168.1.0/24"
+  availability_zone = "ap-south-1a"
+  tags = {
+    Name = "${local.env}-Subnet"
+  }
+}
+
+resource "aws_instance" "myinstance" {
+  subnet_id     = aws_subnet.subnet1.id
+  ami           = "ami-00ca570c1b6d79f36"
+  instance_type = "t3.micro"
+  tags = {
+    Name = "${local.env}-server"
+  }
+}
+
+--------------------------------------------------------------------------------------------------------------
+
+terraform workspace:
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+locals {
+  instance_type = {
+    dev  = "t3.micro"
+    prod = "t3.small"
+  }
+}
+
+resource "aws_instance" "myinstance" {
+  ami           = "ami-00ca570c1b6d79f36"
+  instance_type = local.instance_type[terraform.workspace]
+  tags = {
+    Name = "${terraform.workspace}-server"
+  }
+}
+
+output "active_workspace" {
+  value = terraform.workspace
+}
+
+output "selected_type" {
+  value = local.instance_type[terraform.workspace]
+}
+
+terraform workspace list
+terraform workspace new dev
+terraform workspace select dev
+terraform workspace show
+terraform workspace delete dev
+-------------------------------------------------------------------------------------------------------------------------
+ Dynamic_local_variable:
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+
+resource "aws_instance" "myinstance" {
+  ami           = "ami-00ca570c1b6d79f36"
+  instance_type = terraform.workspace == "dev" ? "t3.micro" : "t3.small"
+  tags = {
+    Name = "${terraform.workspace}-server"
+  }
+}
+
+output "active_workspace" {
+  value = terraform.workspace
+}
+
+output "selected_type" {
+  value = aws_instance.myinstance.instance_type
+}
+
+-------------------------------------------------------------------------
+vi main.tf
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+terraform{
+backend "s3"{
+bucket = ""
+key = "prod/terraform.tfstate"
+region = "ap-south-1"
+}
+}
+
+resource "aws_instance" "myfirstintance" {
+  ami           = "ami-00ca570c1b6d79f36"
+  instance_type = "t3.micro"
+  tags = {
+    Name = "backend-example"
+  }
+
+}
+
+
+resource "aws_instance" "myfirstintance2" {
+  ami           = "ami-00ca570c1b6d79f36"
+  instance_type = "t3.micro"
+  tags = {
+    Name = "backend-example2"
+  }
+
+}
+
+
+terraform init
+terraform plan
+terraform apply --auto-approve
+--------------------------------------------------------------
+--to bring back state file to local remove backend s3 in above code
+
+terraform init -migrate-state
+terraform state list
+
+terraform state list
+terraform state rm aws_instance.mysecond 
+when we remove state file resource remove code in main.tf for particule resource
+
+terraform import aws_instance instace_id
+--it is used to bring back state file
+------------------------------------------------------------
+
+for state locking, we use DynamoDB to store the state locking mechanism, for that lets create a dynamodb table first
+
+column = LockID --much be same
+vi main.tf
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+terraform {
+  backend "s3" {
+    bucket         = "terraform-statefile-bysai"
+    key            = "prod/terraform.tfstate"
+    encrypt        = true
+    dynamodb_table = "dynamicdb-table-state-lock"
+    region         = "ap-south-1"
+  }
+}
+
+
+resource "aws_instance" "myfirstintance" {
+  ami           = "ami-00ca570c1b6d79f36"
+  instance_type = "t3.micro"
+  tags = {
+    Name = "backend-example"
+  }
+
+}
+
+---------------------------------------------------------------
+for multepile region
+
+provider "aws"{
+alias = "ap-south-1"
+region = "ap-south-1"
+}
+
+provider "aws"{
+alias = "eu-west-1"
+region = "eu-west-1"
+}
+
+
+resource "aws_instance" "myinstance"{
+ami = ""
+instance_type = "t3.micro"
+provider = "aws.ap-south-1"
+tags ={
+Name = "my"
+}
+
+-----------------------------------------------------------------------------------------------------------------
+                                         Class-54(mega aggrements)
+
+depends_on
+
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "myinstance" {
+  ami           = "ami-00ca570c1b6d79f36"
+  instance_type = "t3.micro"
+  tags = {
+    Name = "DEpendsOnEIP"
+  }
+}
+
+resource "aws_eip" "elp1" {
+  instance   = aws_instance.myinstance.id
+  depends_on = [aws_instance.myinstance]
+}
+
+
+output "elastic_ip" {
+  value = aws_eip.elp1.public_ip
+}
+
+-----------------------------------------------------------------
+count :
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "myinstance" {
+  count         = 2
+  ami           = "ami-00ca570c1b6d79f36"
+  instance_type = "t3.micro"
+  tags = {
+    Name = "server-${count.index}"
+
+  }
+}
+
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+variable "instance_type" {
+  type    = list(string)
+  default = ["t3.micro", "t3.small", "t3.micro"]
+}
+
+variable "instance_name" {
+  type    = list(string)
+  default = ["dev", "prod", "test"]
+}
+
+resource "aws_instance" "myinstance" {
+  count         = length(var.instance_type)
+  ami           = "ami-00ca570c1b6d79f36"
+  instance_type = var.instance_type[count.index]
+  tags = {
+    Name = var.instance_name[count.index]
+
+  }
+}
+
+-------------------------------------------------------------
+for_each :
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+
+resource "aws_instance" "myinstance" {
+  for_each      = toset(["test", "prod", "dev"])
+  ami           = "ami-00ca570c1b6d79f36"
+  instance_type = "t3.micro"
+  tags = {
+    Name = "${each.key}"
+
+  }
+}
+
+
+output "instance_id" {
+  value = { for k, v in aws_instance.myinstance : k => v.id }
+}
+
+output "instance_name" {
+  value = { for k, v in aws_instance.myinstance : k => v.tags.Name }
+}
+
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+variable "instances" {
+  type = map(string)
+  default = {
+    dev  = "t3.micro"
+    prod = "t3.small"
+    test = "t3.micro"
+  }
+}
+
+resource "aws_instance" "myinstance" {
+  for_each      = var.instances
+  ami           = "ami-00ca570c1b6d79f36"
+  instance_type = each.value
+  tags = {
+    Name = "${each.key}"
+  }
+}
+
+output "instance_id" {
+  value = {for k, v in aws_instance.myinstance : k => v.id }
+}
+
+output "instance_name" {
+  value = {for k, v in aws_instance.myinstance : k => { "Name" = v.tags.Name } }
+
+}
+
+-------------------------------------------------
+lifecycle:
+
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "myinstance" {
+  ami           = "ami-00ca570c1b6d79f36"
+  instance_type = "t3.small"
+  tags = {
+    Name = "prod"
+  }
+  lifecycle {
+    ignore_changes = [instance_type]
+  }
+}
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "myinstance" {
+  ami           = "ami-00ca570c1b6d79f36"
+  instance_type = "t3.small"
+  tags = {
+    Name = "prod"
+  }
+  lifecycle {
+    ignore_changes = all
+  }
+}
+
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "myinstance" {
+  ami           = "ami-00ca570c1b6d79f36"
+  instance_type = "t3.small"
+  tags = {
+    Name = "prod"
+  }
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "myinstance" {
+  ami           = "ami-00ca570c1b6d79f36"
+  instance_type = "t3.small"
+  tags = {
+    Name = "prod"
+  }
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+--------------------------------------------------------------------------------------------------
+
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+variable "instance"{
+type = map(object({
+instance_type = string 
+availability_zone = string}))
+default ={
+"webserver1" = { instance_type = "t3.micro", availability_zone = "ap-south-1a"}
+"webserver2" = { instance_type = "t3.micro", availability_zone = "ap-south-1b"}
+}
+
+
+resource "aws_instance" "myinstance" {
+  for_each = var.instance
+  ami           = "ami-00ca570c1b6d79f36"
+  instance_type = each.value.instance_type
+  availability_zone = each.value.availability_zone
+  tags = {
+    Name = "${each.key}"
+  }
+  
+}
+
+---------------------------------------------------------------------------------------
+
+Local provider:
+
+provider "local"{
+}
+
+resource "local_file" "one"{
+file_name = "test.txt"
+content = "this is from test data from tf using local provider
+}
+
+--------------------------------------------
+
+yum install docker
+systemctl start docker
+
+
+terraform {
+  required_providers {
+    docker = {
+      source  = "kreuzwerker/docker"
+      version = "3.6.2"
+    }
+  }
+}
+
+provider "docker" {
+  host = "unix:///var/run/docker.sock"
+}
+
+# Pulls the image
+resource "docker_image" "nginx" {
+  name = "nginx:latest"
+  keep_locally = false
+}
+
+# Create a container
+resource "docker_container" "nginx" {
+  image = docker_image.nginx.image_id
+  name  = "nginx_container"
+  ports{
+    internal = 80
+    external = 8080
+}
+}
+
+
+output "container_name"{
+value = docker_container.nginx.name
+}
+
+output "container_id"{
+value = docker_container.nginx.id
+}
+
+output "nginx_url"{
+value = "   :8080"
+}
+-----------------------------------------------
+
+install kubernetes
+
+
+terraform {
+  required_providers {
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "~> 2.29"
+    }
+  }
+  required_version = ">= 1.0"
+}
+
+provider "kubernetes" {
+  config_path = "~/.kube/config"   # Path to your kubeconfig
+}
+
+# Create a namespace
+resource "kubernetes_namespace" "demo" {
+  metadata {
+    name = "demo"
+  }
+}
+
+# Deployment
+resource "kubernetes_deployment" "nginx" {
+  metadata {
+    name      = "nginx-demo"
+    namespace = kubernetes_namespace.demo.metadata[0].name
+    labels = {
+      app = "nginx"
+    }
+  }
+
+  spec {
+    replicas = 2
+
+    selector {
+      match_labels = {
+        app = "nginx"
+      }
+    }
+
+    template {
+      metadata {
+        labels = {
+          app = "nginx"
+        }
+      }
+
+      spec {
+        container {
+          name  = "nginx"
+          image = "nginx:latest"
+
+          port {
+            container_port = 80
+          }
+        }
+      }
+    }
+  }
+}
+
+# Service
+resource "kubernetes_service" "nginx_service" {
+  metadata {
+    name      = "nginx-service"
+    namespace = kubernetes_namespace.demo.metadata[0].name
+  }
+
+  spec {
+    selector = {
+      app = "nginx"
+    }
+
+    port {
+      port        = 80
+      target_port = 80
+    }
+
+    type = "LoadBalancer"
+  }
+}
+
+-----------------------------------------
+
+sudo yum update -y
+sudo yum install -y wget unzip
+wget https://github.com/GoogleCloudPlatform/terraformer/releases/download/0.8.24/terraformer-aws-linux-amd64 -O terraformer
+chmod +x terraformer
+sudo mv terraformer /usr/local/bin/
+echo 'export PATH=$PATH:/usr/local/bin' >> ~/.bashrc
+source ~/.bashrc
+terraformer -v
+
+
+create 3 instance manually and import by terrafomer
+
+terraform import aws --resources=ec2_instance --regions=ap-south-1
+cd generate
+ls
+--------------------------------------------------------------------
+
+                            Class-56
+Provisioner local-exec:
+
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "example" {
+  ami           = "ami-00ca570c1b6d79f36"
+  instance_type = "t3.micro"
+  tags = {
+    Name = "local-exec"
+  }
+  provisioner "local-exec" {
+    command = "echo 'instance iD : ${self.id}' > instance.txt"
+  }
+}
+
+
+output "instance_id" {
+  value = aws_instance.example.id
+}
+
+
+-----------------------------------------------
+Provisioner remote-exec:
+
+vi ~/.ssh/id_rsa
+ --paste pem.file
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "example" {
+  ami           = "ami-00ca570c1b6d79f36"
+  instance_type = "t3.micro"
+  key_name = "mumbaikops-keypair"
+  tags = {
+    Name = "remote-exec"
+  }
+
+  // Connection block defines how to connect to the instance
+  connection {
+    type        = "ssh"
+    user        = "ec2-user"
+    private_key = file("~/.ssh/id_rsa")
+    host        = self.public_ip // 'self' refers to the instance being created
+  }
+
+  // Provisioner block runs commands using the connection details
+  provisioner "remote-exec" {
+    inline = [
+      "sudo yum update -y",
+      "sudo yum install httpd -y",
+      "sudo systemctl start httpd"
+    ]
+  }
+}
+
+output "instance_id" {
+  value = aws_instance.example.id
+}
+
+----------------------------------------------------------
+provisioner file:
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "example" {
+  ami           = "ami-00ca570c1b6d79f36"
+  instance_type = "t3.micro"
+  key_name      = "mumbaikops-keypair"
+  tags = {
+    Name = "local-exec"
+  }
+
+  provisioner "file" {
+    source      = "remote_script.sh"
+    destination = "/tmp/remote_script.sh"
+    connection {
+      type        = "ssh"
+      user        = "ec2-user"
+      private_key = file("~/.ssh/id_rsa")
+      host        = self.public_ip // 'self' refers to the instance being created
+    }
+  }
+ // Provisioner block runs commands using the connection details
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /tmp/remote_script.sh",
+      "/tmp/remote_script.sh"
+    ]
+    connection {
+      type        = "ssh"
+      user        = "ec2-user"
+      private_key = file("~/.ssh/id_rsa")
+      host        = self.public_ip // 'self' refers to the instance being created
+    }
+
+  }
+}
+
+output "instance_id" {
+  value = aws_instance.example.id
+}
+
+vi remote_script.sh
+
+
+
+
+#!/bin/bash
+
+#Example commands to run on the remote instance
+echo "Running remote script"
+
+#Update the system
+sudo yum update -y
+
+#Install Apache HTTP Server
+sudo yum install -y httpd
+
+#Start and enable the Apache service
+sudo systemctl start httpd
+sudo systemctl enable httpd
+
+#Write content to /var/www/html/index.html with sudo
+echo "<html><h1>Welcome to Naresh IT AWS Infra created using Terraform in Mumbai Region!</h1></html>" | sudo tee /var/www/html/index.html > /dev/null
+
+--------------------------------------
+
+Dynamic block:
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+locals {
+  ingress_rules = [{
+    port        = 443
+    description = "Ingress rules for port 443"
+    },
+    {
+      port        = 80
+      description = "Ingress rules for port 80"
+    },
+    {
+      port        = 8080
+      description = "ingress rules for port 8080"
+    }
+  ]
+}
+
+resource "aws_instance" "local_example" {
+   ami                    = "ami-00ca570c1b6d79f36"
+  instance_type          = "t3.micro"
+  vpc_security_group_ids = [aws_security_group.main.id]
+  tags = {
+    Name = "terraform ec2"
+  }
+}
+
+resource "aws_security_group" "main" {
+  egress = [
+    {
+      cidr_blocks     = ["0.0.0.0/0"]
+      description     = "*"
+      from_port       = 0
+      ipv6_cidr_blocks = []
+      prefix_list_ids = []
+      protocol        = "-1"
+      security_groups = []
+      self            = false
+      to_port         = 0
+  }]
+
+  dynamic "ingress" {
+    for_each = local.ingress_rules
+    content {
+      description = ingress.value.description
+      from_port   = ingress.value.port
+      to_port     = ingress.value.port
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+  }
+  tags = {
+    Name = "tera_sg"
+  }
+}
+
+-----------------------------------------------------------------
+
+
+Data Source : default
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+data "aws_vpc" "default" {
+  default = true
+}
+
+data "aws_subnets" "default" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.default.id]
+  }
+}
+
+resource "aws_instance" "example" {
+  ami           = "ami-00ca570c1b6d79f36"
+  instance_type = "t3.micro"
+  subnet_id     = data.aws_subnets.default.ids[0]
+}
+
+data "aws_s3_bucket" "example" {
+  bucket = "tera-test-s3124"
+}
+
+
+output "bucket_arn" {
+  value = data.aws_s3_bucket.example.arn
+}
