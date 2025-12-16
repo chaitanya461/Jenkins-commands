@@ -1,0 +1,170 @@
+Step 1 Launch an Ubuntu (22.04) T2 Large Instance, create IAM role and attach admin permissions
+
+Step 2 Install Jenkins, Docker and Trivy. Create a Sonarqube Container using Docker.
+
+Step 3 Create a TMDB API Key.
+
+Step 4 Install Prometheus and Grafana On the new Server.
+
+Step 5 Install the Prometheus Plugin and Integrate it with the Prometheus server.
+
+Step 6 Email Integration With Jenkins and Plugin setup. I
+
+Step 7 Install Plugins like JDK, Sonarqube Scanner, Nodejs, and OWASP Dependency Check.
+
+Step 8 Create a Pipeline Project in Jenkins using a Declarative Pipeline
+
+Step 9 Install OWASP Dependency Check Plugins
+
+Step 10 Docker Image Build and Push
+
+Step 11 Deploy the image using Docker
+
+Step 12 Setup AWS EKS with Terraform
+
+Step 13 Access the Netflix app on the Browser.
+
+Step 14 Terminate the AWS EC2 Instances.
+
+--------------------------------------------
+
+Script 1 for Terraform, kubectl, Aws cli
+
+vi script1.sh
+
+#!/bin/bash
+
+#install terraform
+
+sudo apt install wget -y
+
+wget -0- https://apt.releases.hashicorp.com/gpg | sudo gpg-dearmor -o/usr/share/keyrings/hashicorp-archive-
+
+keyring.gpg
+
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release-cs) main" sudo tee /etc/apt/sources.list.d/hashicorp.list
+
+sudo apt update && sudo apt install terraform
+
+#install Kubectl on Jenkins
+
+sudo apt update
+
+sudo apt install curl -y
+
+curl -LO https://dl.k8s.io/release/$(curl-L-s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl
+
+sudo install o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+kubectl version-client
+
+#install Aws cli
+
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" o "awscliv2.zip"
+
+sudo apt-get install unzip -y
+
+unzip awscliv2.zip
+
+sudo ./aws/install
+
+Step 2 Install Jenkins, Docker and Trivy
+
+Script2 for Java, Jenkins, Docker
+
+vi script2.sh
+
+#!/bin/bash
+
+sudo apt update -y
+
+wget -0 https://packages.adoptium.net/artifactory/api/gpg/key/public tee /etc/apt/keyrings/adoptium.asc echo "deb [signed-by=/etc/apt/keyrings/adoptium.asc] https://packages.adoptium.net/artifactory/deb $(awk -F= /^VERSION_CODENAME/{print$2}' /etc/os-release) main" tee /etc/apt/sources.list.d/adoptium.list
+
+sudo apt update -y
+
+sudo apt install temurin-17-jdk-y
+
+/usr/bin/java --version
+
+curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key sudo tee /usr/share/keyrings/jenkins-keyring.asc
+
+> /dev/null
+
+echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/ sudo tee
+
+/etc/apt/sources.list.d/jenkins.list > /dev/null
+
+sudo apt-get update -y
+
+sudo apt-get install jenkins -y
+
+sudo systemctl start jenkins
+
+#install docker
+
+#Add Docker's official GPG key:
+
+sudo apt-get update
+
+sudo apt-get install ca-certificates curl gnupg -y
+
+sudo install -m 0755-d/etc/apt/keyrings
+
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg-dearmor o /etc/apt/keyrings/docker.gpg
+
+sudo chmod a+r/etc/apt/keyrings/docker.gpg
+
+#Add the repository to Apt sources:
+
+echo
+
+"deb [arch=$(dpkg--print-architecture) signed-by=/etc/apt/keyrings/docker.gpg]
+
+https://download.docker.com/linux/ubuntu \
+
+$(./etc/os-release && echo "$VERSION CODENAME") stable" | \ sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+sudo apt-get update
+
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin y
+
+sudo usermod ag docker ubuntu
+
+newgrp docker
+----------------------::::::------
+http://ip:8080
+
+vi trivy.sh
+
+sudo apt-get install wget apt-transport-https gnupg lsb-release -y
+
+wget -q0https://aquasecurity.github.io/trivy-repo/deb/public.key gpg-dearmor sudo tee
+
+/usr/share/keyrings/trivy.gpg> /dev/null
+
+echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc)
+
+main" sudo tee a /etc/apt/sources.list.d/trivy.list
+
+sudo apt-get update
+
+sudo apt-get install trivy -y
+---_-_--------------------------------------
+Job 1: EKS Provision
+
+Create a S3 private bucket devsecops-netflix-reyaz
+
+Install terraform plugin
+
+let's find the path to our Terraform (we will use it in the tools section of Terraform)
+
+In EC2 instance run the below command
+
+which terraform
+
+Now Manage Jenkins -> Tools
+
+Terraform --> Name: terraform, uncheck install automatically, install directory /usr/bin/
+
+Now create a new pipeline job for the Eks provision
+
