@@ -410,7 +410,137 @@ sudo vi /etc/prometheus/prometheus.yml
   static_configs:
   - targets: ['<jenkins-ip>:8080']
 
+example
+----
+static_configs:
+  - targets: ["localhost:9090"]
+
+- job_name: jenkins
+  metrics_path: '/prometheus'
+  static_configs:
+  - targets: ['13.235.0.165:8080']
+-----
 promtool check config /etc/prometheus/prometheus.yml
 
 sudo systemctl restart Prometheus
+curl -X POST http://localhost:9090/-/reload
+
+http://<ip>:9090/targets
+
+Click On Dashboard -> symbol -> Import Dashboard-> Use Id 9964 and click on load
+-------------------------------------------+--------
+
+Step 6 Email Integration With Jenkins and Plugin Setup
+
+Install Email Extension Plugin in Jenkins.
+
+Go to your Gmail and click on your profile
+
+Then click on Manage Your Google Account -> click on the security tab on the left side panel you will
+
+get this page(provide mail password).
+
+2-step verification should be enabled.
+Once the plugin is installed in Jenkins, click on manage Jenkins -> configure system there mail Notification section configure the details
+
+E-mail Notification
+
+SMTP Server --> smtp.gmail.com
+
+Advanced --> Use SMTP authentication
+
+Username trainerreyaz@gmail.com
+
+password guyyqkpaqhknshpk (the generated password not your gmail pwd)
+
+use ssl
+
+SMTP port 465
+
+Test
+
+------------------------------------------------------
+
+Step 7 Install Plugins like JDK, Sonarqube Scanner, NodeJs, OWASP Dependency Check
+
+Install Plugin
+
+Goto Manage Jenkins Plugins Available Plugins →
+
+Install below plugins
+
+Eclipse Temurin Installer (Install without restart)
+
+SonarQube Scanner (Install without restart)
+
+NodeJs Plugin (Install Without restart)
+
+Docker
+
+Docker Commons
+
+Docker Pipeline
+
+Docker API
+
+Docker-build-step
+
+Goto Manage Jenkins Tools Install JDK(17) and NodeJs (16) Click on Apply and Save
+
+1 JDK installations -> Add JDK -> Name: jdk23, remove install oracle and add Install from adoptium.net and select jdk-23+37 (install automatically)
+
+SonarQube Scanner installations -> Add SonarQube Scanner--> Name sonar-scanner, install automatically --> version: sonarscanner 6.1 latest
+
+NodeJS installations -> Add NodeJS install automatically install from nodejs.org -> version nodejs 16.2.0
+
+Docker installations --> Name docker--> install automatically --> Add installer --> select docker.com
+
+--> latest
+
+Configure Sonar Server in Manage Jenkins
+
+Configure Sonar Server in Manage Jenkins
+
+Go to your Sonarqube Server. http://ip:9000
+
+Click on Administration Security and click on Generate Token Users Click on Tokens and Update Token Give it a name netflix →
+
+squ_d2f19b7e2b2cb580143fe89c2552007b0dc8619a
+
+Goto Jenkins Dashboard Manage Jenkins Credentials Add Secret Text.
+
+Kind Secret Text
+
+Scope Global
+
+Secret Paste the sonar key you copied
+
+ID sonar-token
+
+Desc sonar-token
+
+Adding sonar server details in Jenkins:
+
+Now, go to Dashboard Manage Jenkins System -> SonarQube servers
+
+Name sonar-server
+
+Server URL http://35.154.52.225:9000
+
+Server authentication token sonar-token that you created in credentials.
+
+In the Sonarqube Dashboard add a quality gate
+
+Administration-> Configuration->Webhooks -->
+
+create
+
+Name Jenkins
+
+URL http://35.154.52.225:8080/sonarqube-webhook/
+
+Secret empty
+
+
+
 
