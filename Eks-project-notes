@@ -1,0 +1,90 @@
+Launch EC2 amazon Linux 2:
+
+Install AWSCLI, see already exits or not Create a user, eks-admin and give admin permissions
+
+Install and Configure AWSCLI
+
+aws configure or attach iam role with admin permission 
+
+Install Kubectl on machine
+
+sudo yum update -y
+
+curl -LO "https://dl.k8s.io/release/$(curl Ls https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+
+chmod +x ./kubectl
+
+mkdir -p $HOME/bin && cp/kubectl $HOME/bin/kubectl && export PATH=$HOME/bin:$PATH echo 'export PATH=$HOME/bin:$PATH' >> ~/.bashrc
+
+kubectl version
+
+install EKSCTL:
+
+curl-silent-location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s) amd64.tar.gz" tar xz-C/tmp
+
+sudo mv/tmp/eksctl /usr/local/bin
+
+export PATH=$PATH:/usr/local/bin/
+
+eksctl version
+
+Now Create EKS Cluster
+
+I
+
+eksctl create cluster-name reyaz-cluster-region ap-south-1-node-type t2.small-nodes-min 2-nodes-max 3
+
+eksctl get cluster
+
+kubectl get nodes       -- if you get errors
+
+the error message "error: exec plugin: invalid apiVersion client.authentication.k8s.io/vlalphal" occurs when the kubectl the version you are using is incompatible with the API version of your Kubernetes cluster. To resolve this error, you can upgrade your kubectl version, update your resource definition files, or upgrade your Kubernetes cluster to ensure compatibility.
+
+mv kubectl kubectl_1.24
+
+mv bin bin 1.24
+
+curl -0 https://s3.us-west-2.amazonaws.com/amazon-eks/1.23.15/2023-01-11/bin/linux/amd64/kubectl
+
+chmod +x ./kubectl
+
+mkdir -p $HOME/bin && cp/kubectl $HOME/bin/kubectl && export PATH=$PATH: $HOME/bin
+
+kubectl version
+
+aws eks update-kubeconfig --name reyaz-cluster --region ap-south-1
+
+kubectl get nodes
+
+****if required*****
+
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" o "awscliv2.zip"
+
+unzip awscliv2.zip
+
+sudo ./aws/install-update
+
+
+install GIT
+
+yum install git -y
+
+git clone https://github.com/ReyazShaik/eks-flask-mysql-project.glit
+
+kubectl apply f mysql-secrets.yml -f mysql-configmap.yml -f mysql-deployment.yml -f mysql-svc.yml
+
+kubectl apply f two-tier-app-deployment.yml -f two-tier-app-svc.yml
+
+kubectl get all
+
+kubectl get deploy
+
+to restart
+
+kubectl rollout restart deployment two-tier-app
+
+kubectl delete deployment two-tier-app mysql
+
+kubectl delete service two-tier-app-service mysql
+
+eksctl delete cluster-name reyaz-cluster
