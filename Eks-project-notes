@@ -17,7 +17,7 @@ chmod +x ./kubectl
 mkdir -p $HOME/bin && cp/kubectl $HOME/bin/kubectl && export PATH=$HOME/bin:$PATH echo 'export PATH=$HOME/bin:$PATH' >> ~/.bashrc
 
 kubectl version
-
+-------------------------
 install EKSCTL:
 
 curl-silent-location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s) amd64.tar.gz" tar xz-C/tmp
@@ -26,13 +26,13 @@ sudo mv/tmp/eksctl /usr/local/bin
 
 export PATH=$PATH:/usr/local/bin/
 
-eksctl version
+source ~/.bashrc
 
+eksctl version
+------_-----------------------
 Now Create EKS Cluster
 
-I
-
-eksctl create cluster-name reyaz-cluster-region ap-south-1-node-type t2.small-nodes-min 2-nodes-max 3
+eksctl create cluster --name reyaz-cluster --region ap-south-1 --node-type t2.small --nodes-min 2 --nodes-max 3
 
 eksctl get cluster
 
@@ -55,7 +55,7 @@ kubectl version
 aws eks update-kubeconfig --name reyaz-cluster --region ap-south-1
 
 kubectl get nodes
-
+------------------------------
 ****if required*****
 
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" o "awscliv2.zip"
@@ -63,7 +63,7 @@ curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" o "awscliv2.zip"
 unzip awscliv2.zip
 
 sudo ./aws/install-update
-
+-------------------------------
 
 install GIT
 
