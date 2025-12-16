@@ -1,0 +1,144 @@
+CI CD AWS DevOps Project with GitHub:
+
+Launch Amazon Linux 2 EC2 instance:
+
+yum install docker -y
+
+service docker start
+
+service docker status.
+
+docker images
+
+docker ps-a
+
+As we need to have project in Linux machine we need to clone the project from GitHub repository
+
+install git
+
+--> yum install git -y
+
+git clone https://github.com/ReyazShaik/website.git
+
+--> cd website
+
+Dockerfile is used to create images automatically:
+-------------
+Pushing Image to ECR
+
+Create a Private Respository in ECS
+
+Name: website
+
+Create a Role with Amazon EC2ContainerRegistryFullAccess access and attach to EC2
+
+IN ECR respository, click on view push commands
+
+aws ecr get-login-password-region ap-south-1 docker login--username AWS --password-stdin 289857919920.dkr.ecr.ap-south-1.amazonaws.com.
+
+docker build -t website
+
+docker tag website: latest 289857919920.dkr.ecr.ap-south-1.amazonaws.com/website:latest
+
+docker push 289857919920.dkr.ecr.ap-south-1.amazonaws.com/website: latest
+
+See the image in ECR
+-----------------
+
+Create a ECS Cluster with Fargate and enable Monitoring(optional)
+
+Cluster name websitecluster
+
+Fargate managed hu AWS
+
+------------------
+
+Create a CodeBuild Project
+
+--> select CodeBuild and create Build Project
+
+--> projectname: website
+
+Project Type: default
+
+--> Source 1 Primary: Source Provider: GitHub
+
+Public Repository:
+
+Repository URL: https://github.com/ReyazShaik/website
+
+Leave rest defaults
+
+Service role: New service role, or select if you have one
+
+Use BuildSpec:
+
+Buildspec name buildspec.yml [This file is there in repo, update values in buildspec.yml]
+
+No artifacts
+
+unchecklogs
+
+--> Create Build Project
+
+====> Search for ROLE in IAM codebuildrolenew Add AmazonEC2ContainerRegistryFullAccess and Amazon EC2Container Registry PowerUser, SecretsManagerReadWrite permissions
+
+--> NOw start the Build--> check phase details [This will get error in login, as role doesn't have permission to ecr]
+
+--> And again start build now this build will create a new image in ECR check in ECR
+
+----------------------
+
+Now create a CodePipeline -> you cannot create CodeDeploy directly no option, first create pipeline, deploy
+
+ate
+
+Top Screen Recorder
+
+Before that we need to create a new service in ECS as pipeline doesn't have capacity to create service
+
+Create a new Pipeline
+
+--> Name: ECR-CICD
+
+Queued
+
+--> New role
+
+--> Source GitHub v2, Connection Connect to GitHub, connectioname:aws-codepipeline-connection -> connect to
+
+GitHub
+
+install new app-> select repository --> website--> install --> connect
+
+--> Repository name website
+
+--> default Branch master rest keep defaults
+
+Webhook events-> Event Type Push
+
+FilterType Branch Branches> master
+
+--> Trigger no filter
+
+--> Build Provider other providers-> CodeBuild
+
+--> Build: CodeBuild,
+
+ProjectName = website,
+
+Build type: Single
+
+Skip Test stage
+
+--> Deploy provider Amazon ECS, REgion, Clustername, ServiceName, Image definitions file: imagedefinitions.json
+
+(output file)
+
+NOw Pipeline Starts
+Now, see latest CodeBuild, latest ECR for latest image, and elb
+
+I Now modify the index.html in GitHub and automatically pipeline runs and deploys
+
+delete elb, tg, task def, services, stop all tasks and delete cluster
+
