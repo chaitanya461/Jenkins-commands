@@ -459,6 +459,37 @@ SMTP port 465
 
 Test
 
+Click on Manage Jenkins-> credentials and add your mail username and generated password
+
+Kind username and pwd
+
+username trainerreyaz@gmail.com
+
+pwd guyyqkpaqhknshpk (generated pwd)
+
+ID mail
+
+Desc mail
+
+This is to just verify the mail configuration
+
+Now under the Extended E-mail Notification section configure the details as shown in the below images
+
+Extended E-mail Notification
+
+SMTP server smtp.gmail.com
+
+SMTP port 465
+
+Advance select mail
+
+use ssl
+
+Default triggers
+
+always
+
+failure-any
 ------------------------------------------------------
 
 Step 7 Install Plugins like JDK, Sonarqube Scanner, NodeJs, OWASP Dependency Check
