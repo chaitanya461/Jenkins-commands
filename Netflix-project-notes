@@ -734,4 +734,39 @@ http://jenkinsip:8081
 
 ------------------------------------------------
 
+Step 11 Kuberenetes Setup
+
+iTop Screen Recorder
+
+Let's Update the kubeconfig
+
+Go to Jenkins instance and enter the below command
+
+aws eks update-kubeconfig-name EKS_CLUSTER --region ap-south-1
+
+cat.kube/config
+
+copy the entire content and save it as secret.txt in local machine
+
+kubectl get nodes
+
+Install Kubernetes Plugin:
+
+Kubernetes Credentials
+
+Kubernetes Client API
+
+Kubernetes
+
+Kubernetes CLI
+
+goto manage Jenkins> manage credentials > Click on Jenkins global -> add credentials
+
+Kind Secret File
+
+choose secret.txt
+
+ID: k8s
+
+desc: k8s
 
