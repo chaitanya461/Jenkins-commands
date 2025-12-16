@@ -476,4 +476,163 @@ Key Points:
 --Pod Affinity
 
 --Pod affinity allows users to specify which pods a pod should or should not be scheduled with based on labels. For example, you can use pod affinity to specify that a pod should be scheduled on the same node as other pods with a specific label, such as app-database.
+----------------------------------------------------
+
+mini project for mongobd & mongoexpress
+vi mongo-stack.yaml
+
+# 1. Secret for MongoDB Credentials
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mongodb-secret
+type: Opaque
+data:
+  # Values must be base64 encoded strings
+  # Run `echo -n 'your_username' | base64` and `echo -n 'your_password' | base64`
+  mongo-root-username: YWRtaW4= # base64 encoded for "admin"
+  mongo-root-password: cGFzc3dvcmQ= # base64 encoded for "password"
+---
+
+# 2. ConfigMap for MongoDB connection URL
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongodb-configmap
+data:
+  database_url: mongodb-service # This must match the name of the MongoDB internal Service below
+---
+
+# 3. Persistent Volume Claim (PVC) for MongoDB data
+# This requests storage from your Kubernetes cluster's default StorageClass
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongodb-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce # This access mode means the volume can be mounted as read-write by a single Node
+  resources:
+    requests:
+      storage: 1Gi # Request 1 Gigabyte of storage, adjust as needed
+---
+
+# 4. MongoDB Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb-deployment
+  labels:
+    app: mongodb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+      - name: mongodb
+        image: mongo:latest # Use a stable version for production, e.g., mongo:6.0
+        ports:
+        - containerPort: 27017 # Default MongoDB port
+        env:
+        # Inject credentials from the Secret
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: mongo-root-username
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: mongo-root-password
+        volumeMounts:
+        - name: mongodb-data
+          mountPath: /data/db # Default data path for MongoDB
+      volumes:
+      - name: mongodb-data
+        persistentVolumeClaim:
+          claimName: mongodb-pvc
+---
+
+# 5. MongoDB Internal Service (ClusterIP)
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-service # This name is used in the ConfigMap and by the Mongo Express app
+spec:
+  selector:
+    app: mongodb
+  ports:
+  - protocol: TCP
+    port: 27017
+    targetPort: 27017
+  type: ClusterIP # Only accessible within the Kubernetes cluster
+---
+
+# 6. Mongo Express Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-express
+  labels:
+    app: mongo-express
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo-express
+  template:
+    metadata:
+      labels:
+        app: mongo-express
+    spec:
+      containers:
+      - name: mongo-express
+        image: mongo-express:latest # Official Mongo Express image
+        ports:
+        - containerPort: 8081 # Default Mongo Express web port
+        env:
+        # Inject connection details from Secret and ConfigMap
+        - name: ME_CONFIG_MONGODB_ADMINUSERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: mongo-root-username
+        - name: ME_CONFIG_MONGODB_ADMINPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: mongo-root-password
+        - name: ME_CONFIG_MONGODB_SERVER
+          valueFrom:
+            configMapKeyRef:
+              name: mongodb-configmap
+              key: database_url
+---
+
+# 7. Mongo Express External Service (LoadBalancer)
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-express-service
+spec:
+  selector:
+    app: mongo-express
+  type: LoadBalancer # Exposes the service externally via a cloud LoadBalancer IP
+  ports:
+  - protocol: TCP
+    port: 80 # The port the service exposes
+    targetPort: 8081 # The container port to forward traffic to
+
+
+kubectl apply -f mongo-stack.yaml
+kubectl get all
+
+
 
