@@ -189,7 +189,7 @@ Currently I am in default namespace, how to check
 
 kubectl config view [ output doesn't show namespace, if you don't see any namespace, this is default]
 
-kubectl config set-context-current-namespace dev [This is use to switch to move from another namespace]
+kubectl config set-context --current --namespace dev [This is use to switch to move from another namespace]
 
 kubectl config view [ Now this output show dev namespace]
 
@@ -211,7 +211,7 @@ Create a namespace in kubernetes :
 
 kubectl create ns dev [use if already exits]
 
-kubectl config set-context-current-namespace-dev
+kubectl config set-context --current --namespace dev
 
 First create a sample serviceaccount here in kubernetes called jack
 
