@@ -410,7 +410,7 @@ SonarQube Scanner installations -> Add SonarQube Scanner--> Name sonar-scanner, 
 
 NodeJS installations -> Add NodeJS install automatically install from nodejs.org -> version nodejs 16.2.0
 
-Docker installations --> Name docker--> install automatically --> Add installer --> select docker.com
+Docker installations --> Name docker--> install automatically --> Add installer --> select docker.com or director /usr (which docker /usr/bin/docker)
 
 --> latest
 
