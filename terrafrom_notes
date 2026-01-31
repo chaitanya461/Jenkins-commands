@@ -872,7 +872,7 @@ terraformer -v
 
 create 3 instance manually and import by terrafomer
 
-terraform import aws --resources=ec2_instance --regions=ap-south-1
+terraformer import aws --resources=ec2_instance --regions=ap-south-1
 cd generate
 ls
 --------------------------------------------------------------------
