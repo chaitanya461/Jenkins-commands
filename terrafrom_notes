@@ -254,6 +254,9 @@ terraform state list
 
 terraform taint aws_s3_bucket.mybucket
 
+terraform apply --auto-approve
+
+terraform destroy --auto-approve
 ------------------------------------------------------------------------------------------------------------------
 
 local varible:
